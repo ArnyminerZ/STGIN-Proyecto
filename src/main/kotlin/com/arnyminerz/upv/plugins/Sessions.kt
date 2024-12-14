@@ -11,6 +11,11 @@ data class UserSession(val id: Int)
 
 fun Application.installSessions() {
     install(Sessions) {
-        cookie<UserSession>("user_session")
+        cookie<UserSession>("user_session") {
+            cookie.path = "/"
+            cookie.maxAgeInSeconds = 60 * 60 * 24 * 30 // 30 days
+            cookie.httpOnly = true
+            cookie.secure = true
+        }
     }
 }
