@@ -3,6 +3,8 @@ package com.arnyminerz.upv.database
 import com.arnyminerz.upv.database.table.Users
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 
 object ServerDatabase {
@@ -16,13 +18,13 @@ object ServerDatabase {
     private lateinit var database: Database
 
     fun initialize() {
-        val databaseHost = System.getenv("DATABASE_HOST") ?: "./database.db"
-        val databasePort = System.getenv("DATABASE_PORT")
+        val databaseHost = System.getenv("DATABASE_HOST") ?: "localhost"
+        val databasePort = System.getenv("DATABASE_PORT") ?: "5432"
         val databaseName = System.getenv("DATABASE_NAME")
-        val databaseFile = System.getenv("DATABASE_FILE") ?: "./database.db"
+        val databaseFile = System.getenv("DATABASE_FILE") ?: "./database"
         val databaseUser = System.getenv("DATABASE_USER") ?: ""
         val databasePassword = System.getenv("DATABASE_PASSWORD") ?: ""
-        val databaseDriver = System.getenv("DATABASE_DRIVER") ?: "org.postgresql.Driver"
+        val databaseDriver = System.getenv("DATABASE_DRIVER") ?: DRIVER_H2
 
         logger.info("Connecting to database...")
         database = Database.connect(
@@ -38,8 +40,17 @@ object ServerDatabase {
 
         logger.info("Connected to database.")
         logger.info("Initializing tables...")
-        for (table in tables) {
+        for (table in tables) invoke {
             SchemaUtils.createMissingTablesAndColumns(table)
         }
     }
+
+    /**
+     * Invokes the given block of code within a transaction context.
+     *
+     * @param block The code block to be executed within the transaction.
+     * The block has access to the [Transaction] receiver for performing operations within the transaction.
+     */
+    operator fun invoke(block: Transaction.() -> Unit) = transaction(database, block)
+
 }

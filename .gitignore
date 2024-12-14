@@ -37,3 +37,6 @@ out/
 
 ### Docker Volumes ###
 /docker
+
+### Testing Databases ###
+*.db
