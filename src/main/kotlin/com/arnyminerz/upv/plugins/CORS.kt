@@ -21,6 +21,8 @@ fun Application.installCORS() {
             allowMethod(HttpMethod.Delete)
 
             allowHeader(HttpHeaders.Authorization)
+            allowHeader(HttpHeaders.ContentType)
+            allowHeader(HttpHeaders.ContentLength)
         } else {
             logger.warn("Allowing all CORS hosts. This is not recommended for production environments.")
             anyHost()
