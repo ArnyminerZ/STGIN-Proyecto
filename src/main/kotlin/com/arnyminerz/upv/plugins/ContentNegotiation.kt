@@ -7,7 +7,8 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.serialization.json.Json
 
 val json = Json {
-    isLenient = true
+    explicitNulls = true
+    ignoreUnknownKeys = true
 }
 
 fun Application.installContentNegotiation() {

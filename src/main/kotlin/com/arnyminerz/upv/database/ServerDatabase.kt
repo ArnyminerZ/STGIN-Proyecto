@@ -1,5 +1,6 @@
 package com.arnyminerz.upv.database
 
+import com.arnyminerz.upv.database.table.UserSessions
 import com.arnyminerz.upv.database.table.Users
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -11,7 +12,7 @@ object ServerDatabase {
     private const val DRIVER_POSTGRES = "org.postgresql.Driver"
     private const val DRIVER_H2 = "org.h2.Driver"
 
-    private val tables = listOf(Users)
+    private val tables = listOf(Users, UserSessions)
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -41,7 +42,7 @@ object ServerDatabase {
         logger.info("Connected to database.")
         logger.info("Initializing tables...")
         for (table in tables) invoke {
-            SchemaUtils.createMissingTablesAndColumns(table)
+            SchemaUtils.create(table)
         }
     }
 
@@ -51,6 +52,6 @@ object ServerDatabase {
      * @param block The code block to be executed within the transaction.
      * The block has access to the [Transaction] receiver for performing operations within the transaction.
      */
-    operator fun invoke(block: Transaction.() -> Unit) = transaction(database, block)
+    operator fun <Result> invoke(block: Transaction.() -> Result): Result = transaction(database, block)
 
 }
