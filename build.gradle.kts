@@ -22,6 +22,7 @@ dependencies {
     // Ktor
     implementation(libs.ktor.contentNegotiation)
     implementation(libs.ktor.core)
+    implementation(libs.ktor.cors)
     implementation(libs.ktor.tomcat)
     implementation(libs.ktor.serialization.json)
     implementation(libs.ktor.sessions)

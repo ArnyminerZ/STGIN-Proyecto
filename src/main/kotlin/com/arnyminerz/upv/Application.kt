@@ -2,6 +2,7 @@ package com.arnyminerz.upv
 
 import com.arnyminerz.upv.database.ServerDatabase
 import com.arnyminerz.upv.plugins.configureRouting
+import com.arnyminerz.upv.plugins.installCORS
 import com.arnyminerz.upv.plugins.installContentNegotiation
 import com.arnyminerz.upv.plugins.installSessions
 import io.ktor.server.application.Application
@@ -17,6 +18,7 @@ fun main() {
 
 fun Application.module() {
     installContentNegotiation()
+    installCORS()
     configureRouting()
     installSessions()
 }
