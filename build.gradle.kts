@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.jvm)
+    alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ktor)
 }
 
@@ -19,15 +20,22 @@ repositories {
 
 dependencies {
     // Ktor
+    implementation(libs.ktor.contentNegotiation)
     implementation(libs.ktor.core)
     implementation(libs.ktor.tomcat)
+    implementation(libs.ktor.serialization.json)
+    implementation(libs.ktor.sessions)
 
     // Exposed
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
+    implementation(libs.exposed.javatime)
     implementation(libs.exposed.jdbc)
     implementation(libs.h2)
     implementation(libs.postgresql)
+
+    // KotlinX Serialization
+    implementation(libs.kotlinx.serialization)
 
     implementation(libs.logback)
 }
