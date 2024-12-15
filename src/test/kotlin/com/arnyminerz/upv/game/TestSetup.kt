@@ -17,7 +17,7 @@ class TestSetup {
 
     @Test
     fun `test empty`() {
-        val setup = Setup.empty()
+        val setup = Setup.empty(null)
         assertFalse { setup.isReady() }
         assertTrue { setup.isEmpty() }
         assertFalse { setup.anyCollision() }
@@ -36,7 +36,7 @@ class TestSetup {
     @Test
     fun `test anyCollision`() {
         // No collisions for empty setups
-        var setup = Setup.empty()
+        var setup = Setup.empty(null)
         assertFalse { setup.anyCollision() }
 
         // No collisions when just one boat

@@ -5,7 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Setup(
-    val positions: Set<PositionedBoat>
+    val positions: Set<PositionedBoat>,
+    val playerId: String? = null
 ) {
     companion object {
         /**
@@ -44,7 +45,7 @@ data class Setup(
         /**
          * Returns a setup without positioned boats.
          */
-        fun empty(): Setup = Setup(emptySet())
+        fun empty(playerId: String?): Setup = Setup(emptySet(), playerId)
     }
 
     fun isReady(): Boolean = positions.size == Boat.all.size

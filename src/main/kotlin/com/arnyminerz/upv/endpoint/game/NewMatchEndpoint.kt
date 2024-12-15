@@ -54,8 +54,8 @@ object NewMatchEndpoint : SecureEndpoint("/api/matches", HttpMethod.Post) {
         // Generate the game
         val game = Game(
             board = Board(),
-            setupPlayer1 = Setup.empty(),
-            setupPlayer2 = Setup.empty(),
+            setupPlayer1 = Setup.empty(user.id.value),
+            setupPlayer2 = Setup.empty(user2Id),
         )
 
         // Create the match
