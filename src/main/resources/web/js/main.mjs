@@ -30,6 +30,10 @@ const GRID_SIZE = 30;
  * @property {Game} game
  */
 
+function loadingIndicator(isLoading) {
+    document.getElementById('loadingOverlay').style.display = isLoading ? 'block' : 'none';
+}
+
 /**
  * Creates a new match, optionally against a specific user.
  *
@@ -162,23 +166,29 @@ function dragStop(ev) {
 }
 
 async function drop(ev) {
-    ev.preventDefault();
-    const draggedElementId = ev.dataTransfer.getData("text");
-    const draggedElement = document.getElementById(draggedElementId);
-    const cellId = ev.target.id;
-    const [_, row, column] = cellId.split('-').map(Number);
-    if (row == null || column == null) {
-        // invalid cell id, probably dragged over a boat, ignore the drop
-        return;
-    }
+    try {
+        loadingIndicator(true);
+        ev.preventDefault();
 
-    if (!await placeBoat(draggedElementId, column, row)) {
-        console.warn('Invalid boat placement.')
-        return;
-    }
+        const draggedElementId = ev.dataTransfer.getData("text");
+        const draggedElement = document.getElementById(draggedElementId);
+        const cellId = ev.target.id;
+        const [_, row, column] = cellId.split('-').map(Number);
+        if (row == null || column == null) {
+            // invalid cell id, probably dragged over a boat, ignore the drop
+            return;
+        }
 
-    console.info(`Dropped ${draggedElementId} on ${ev.target.id}`);
-    ev.target.appendChild(draggedElement);
+        if (!await placeBoat(draggedElementId, column, row)) {
+            console.warn('Invalid boat placement.')
+            return;
+        }
+
+        console.info(`Dropped ${draggedElementId} on ${ev.target.id}`);
+        ev.target.appendChild(draggedElement);
+    } finally {
+        loadingIndicator(false);
+    }
 }
 
 // --- DRAG AND DROP LOGIC END ---
@@ -205,7 +215,10 @@ window.addEventListener('load', async () => {
     /** @type {HTMLHeadElement} */
     const pendingMatchAgainstMessage = document.getElementById('pendingMatchAgainst');
 
-    newMatchButton.addEventListener('click', async () => await newMatch());
+    newMatchButton.addEventListener('click', async () => {
+        await newMatch();
+        window.location.reload();
+    });
     if (pendingMatches.length <= 0) {
         newMatchButton.removeAttribute('disabled');
         joinMatchButton.setAttribute('disabled', 'true');
