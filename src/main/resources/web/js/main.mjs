@@ -10,12 +10,41 @@ const GRID_SIZE = 30;
  */
 
 /**
+ * @typedef {'HORIZONTAL'|'VERTICAL'} Rotation
+ */
+
+/**
+ * @typedef {Object} Boat
+ * @property {string} name
+ * @property {number} length
+ */
+
+/**
+ * @typedef {Object} Position
+ * @property {number} x
+ * @property {number} y
+ */
+
+/**
+ * @typedef {Object} PositionedBoat
+ * @property {Boat} boat
+ * @property {Position} position
+ * @property {Rotation} rotation
+ */
+
+/**
+ * @typedef {Object} Setup
+ * @property {PositionedBoat[]} positions
+ * @property {string|null} playerId
+ */
+
+/**
  * @typedef {Object} Game
  * @property {Board} board
- * @property {Object} setupPlayer1
- * @property {Object} setupPlayer2
- * @property {[]} player1Bombs
- * @property {[]} player2Bombs
+ * @property {Setup} setupPlayer1
+ * @property {Setup} setupPlayer2
+ * @property {Position[]} player1Bombs
+ * @property {Position[]} player2Bombs
  */
 
 /**
@@ -67,6 +96,9 @@ async function fetchMatches() {
 /** @type {number|null} */
 let matchId = null;
 
+/** @type {string|null} */
+let username = null;
+
 async function requestBoatPlacing(boatId, column, row) {
     const boatElement = document.getElementById(boatId);
     const boatName = boatElement.getAttribute('data-boat');
@@ -101,6 +133,13 @@ async function placeBoat(boatId, cellId) {
     return true;
 }
 
+function updateBoatElement(boat, rotated, size) {
+    const rotation = rotated ? 0 : 90;
+    const translation = rotated ? 0 : ((size - 1) * 15);
+    boat.setAttribute('data-rotated', `${rotated}`);
+    boat.style.transform = `rotate(${rotation}deg) translate(${translation}px, ${translation}px)`;
+}
+
 async function rotateBoat(boatId) {
     // 1 ->  0px
     // 2 -> 15px
@@ -111,17 +150,11 @@ async function rotateBoat(boatId) {
     const size = parseInt(boat.getAttribute('data-size'));
     const rotated = boat.getAttribute('data-rotated') === 'true';
 
-    function updateBoatElement(rotated) {
-        const rotation = rotated ? 0 : 90;
-        const translation = rotated ? 0 : ((size - 1) * 15);
-        boat.setAttribute('data-rotated', `${rotated}`);
-        boat.style.transform = `rotate(${rotation}deg) translate(${translation}px, ${translation}px)`;
-    }
-    updateBoatElement(!rotated);
+    updateBoatElement(boat, !rotated, size);
     console.log('Rotated', draggingId, 'by', rotated ? 0 : 90, 'degrees.');
 
     if (!await requestBoatPlacing(boatId, 0, 0)) {
-        updateBoatElement(rotated);
+        updateBoatElement(boat, rotated, size);
         return false;
     }
 
@@ -131,7 +164,7 @@ async function rotateBoat(boatId) {
 /**
  * @param {Game} game
  */
-function renderGame(game) {
+async function renderGame(game) {
     const board = game.board;
     console.log('Board size is', board.columns, 'columns x', board.rows, 'rows.')
     const boardWidthPx = board.columns * GRID_SIZE;
@@ -186,6 +219,21 @@ function renderGame(game) {
             }
         })
     }
+
+    // Set the positions of the boats from the game
+    const setup = game.setupPlayer1.playerId === username ? game.setupPlayer1 :
+        game.setupPlayer1.playerId === username ? game.setupPlayer2 : null;
+    if (setup == null) {
+        console.error('Invalid setup. Could not find player', username, 'in', game.setupPlayer1.playerId, 'and', game.setupPlayer2.playerId, '.');
+        return
+    }
+    for (const positionedBoat of setup.positions) {
+        console.log('Positioning', positionedBoat.boat.name, 'at', positionedBoat.position.x, positionedBoat.position.y, 'with rotation', positionedBoat.rotation);
+        const boatElement = document.querySelector(`[data-boat=${positionedBoat.boat.name}]`);
+        const cellElement = document.getElementById(`cell-${positionedBoat.position.y}-${positionedBoat.position.x}`);
+        updateBoatElement(boatElement, positionedBoat.rotation === 'VERTICAL', positionedBoat.boat.length);
+        cellElement.appendChild(boatElement);
+    }
 }
 
 // --- DRAG AND DROP LOGIC START ---
@@ -224,7 +272,7 @@ async function drop(ev) {
 // --- DRAG AND DROP LOGIC END ---
 
 window.addEventListener('load', async () => {
-    const username = await checkSession('/login', null);
+    username = await checkSession('/login', null);
     if (username == null) return
 
     const usernameElement = document.getElementById('username');
@@ -269,6 +317,6 @@ window.addEventListener('load', async () => {
 
         console.info(match.game);
         matchId = match.id;
-        renderGame(match.game);
+        await renderGame(match.game);
     }
 });
