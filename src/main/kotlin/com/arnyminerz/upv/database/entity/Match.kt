@@ -63,8 +63,8 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
      * Returns the player associated with the given [userId].
      * May return null if the given [userId] is not in the match.
      */
-    fun player(userId: String): Player? {
-        return when (userId) {
+    fun player(userId: String): Player? = ServerDatabase {
+        when (userId) {
             user1.id.value -> Player.PLAYER1
             user2?.id?.value -> Player.PLAYER2
             else -> null

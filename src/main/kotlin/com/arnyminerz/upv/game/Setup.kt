@@ -22,9 +22,9 @@ data class Setup(
             var setup = Setup(emptySet())
             for (boat in allBoats) {
                 while (true) {
-                    val x = random.nextInt(0, board.columns.toInt())
-                    val y = random.nextInt(0, board.rows.toInt())
-                    val position = Position(x.toUInt(), y.toUInt())
+                    val x = random.nextInt(0, board.columns)
+                    val y = random.nextInt(0, board.rows)
+                    val position = Position(x, y)
                     val rotation = Rotation.entries.random(random)
 
                     val positionedBoat = PositionedBoat(boat, position, rotation)

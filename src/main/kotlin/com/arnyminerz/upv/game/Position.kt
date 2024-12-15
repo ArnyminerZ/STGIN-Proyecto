@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Position(
-    val x: UInt,
-    val y: UInt
+    val x: Int,
+    val y: Int
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class Board(
-    val rows: UInt = 10U,
-    val columns: UInt = 10U,
+    val rows: Int = 10,
+    val columns: Int = 10
 ) {
     fun inBounds(position: Position) = position.x < columns && position.y < rows
 }

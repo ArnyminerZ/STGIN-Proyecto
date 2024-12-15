@@ -11,12 +11,12 @@ data class PositionedBoat(
     /**
      * Returns the positions of all the occupied cells by the boat.
      */
-    fun occupiedCells(): Set<Position> {
-        return (0U until boat.length)
+    private fun occupiedCells(): Set<Position> {
+        return (0 until boat.length)
             .map {
                 Position(
-                    position.x + (if (rotation == Rotation.HORIZONTAL) it else 0U),
-                    position.y + (if (rotation == Rotation.VERTICAL) it else 0U)
+                    position.x + (if (rotation == Rotation.HORIZONTAL) it else 0),
+                    position.y + (if (rotation == Rotation.VERTICAL) it else 0)
                 )
             }
             .toSet()

@@ -3,19 +3,19 @@ package com.arnyminerz.upv.game
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Boat(
+class Boat(
     val name: String,
-    val length: UInt
+    val length: Int
 ) {
     companion object {
-        val all = setOf(SpeedBoat1, SpeedBoat2, SailBoat, Yacht, Cruiser, CargoShip)
+        private val SpeedBoat1 = Boat("SpeedBoat1", 1)
+        private val SpeedBoat2 = Boat("SpeedBoat2", 1)
+        private val SailBoat = Boat("SailBoat", 2)
+        private val Yacht = Boat("Yacht", 3)
+        private val Cruiser = Boat("Cruiser", 4)
+        private val CargoShip = Boat("CargoShip", 5)
 
-        data object SpeedBoat1: Boat("SpeedBoat1", 1u)
-        data object SpeedBoat2: Boat("SpeedBoat2", 1u)
-        data object SailBoat: Boat("SailBoat", 2u)
-        data object Yacht: Boat("Yacht", 3u)
-        data object Cruiser: Boat("Cruiser", 4u)
-        data object CargoShip: Boat("CargoShip", 5u)
+        val all = setOf(SpeedBoat1, SpeedBoat2, SailBoat, Yacht, Cruiser, CargoShip)
     }
 
     override fun equals(other: Any?): Boolean {

@@ -11,6 +11,7 @@
 
     <!-- Import Styles -->
     <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/game.css">
 </head>
 <body>
 <h1>Juego de Barquitos</h1>
@@ -19,6 +20,16 @@
 
 <button id="joinMatchButton" disabled>Unirse</button>
 <button id="newMatchButton" disabled>Nueva Partida</button>
+
+<div id="board"></div>
+<div id="boatsBox">
+    <div id="speedBoat1" class="boat speed" data-boat="SpeedBoat1" data-size="1"></div>
+    <div id="speedBoat2" class="boat speed" data-boat="SpeedBoat2" data-size="1"></div>
+    <div id="sailBoat" class="boat sail" data-boat="SailBoat" data-size="2"></div>
+    <div id="yachtBoat" class="boat yacht" data-boat="Yacht" data-size="3"></div>
+    <div id="cruiserBoat" class="boat cruiser" data-boat="Cruiser" data-size="4"></div>
+    <div id="cargoBoat" class="boat cargo" data-boat="CargoShip" data-size="5"></div>
+</div>
 
 <script type="module" src="./js/main.mjs"></script>
 </body>

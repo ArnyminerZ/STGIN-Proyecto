@@ -1,0 +1,54 @@
+#board {
+    position: absolute;
+    background-color: #3a93dc;
+    margin: 10px;
+}
+
+#board .cell {
+    border: 1px solid black;
+    background-color: #3a93dc;
+}
+
+#board .cell:hover {
+    background-color: #2d73a5;
+}
+
+/* BOATS */
+.boat {
+    height: 30px;
+    border-radius: 30px;
+    position: absolute;
+    z-index: 10;
+}
+.boat::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 30px;
+    position: absolute;
+    background-color: transparent;
+    border: 5px solid rgba(255, 255, 255, 0.5);
+    z-index: 11;
+    left: 5px;
+    top: 5px;
+}
+.boat.speed {
+    width: 30px; /* 30x1 */
+    background-color: #5fbc33;
+}
+.boat.sail {
+    width: 60px; /* 30x2 */
+    background-color: #912cd3;
+}
+.boat.yacht {
+    width: 90px; /* 30x3 */
+    background-color: #c37f33;
+}
+.boat.cruiser {
+    width: 120px; /* 30x4 */
+    background-color: #ffdd7b;
+}
+.boat.cargo {
+    width: 150px; /* 30x5 */
+    background-color: #cd334f;
+}
