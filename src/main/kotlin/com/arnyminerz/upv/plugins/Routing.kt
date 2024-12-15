@@ -3,6 +3,7 @@ package com.arnyminerz.upv.plugins
 import com.arnyminerz.upv.endpoint.auth.LoginEndpoint
 import com.arnyminerz.upv.endpoint.auth.LogoutEndpoint
 import com.arnyminerz.upv.endpoint.auth.RegisterEndpoint
+import com.arnyminerz.upv.endpoint.auth.SessionEndpoint
 import com.arnyminerz.upv.endpoint.type.Endpoint
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.Application
@@ -17,6 +18,7 @@ private val endpoints = listOf(
     RegisterEndpoint,
     LoginEndpoint,
     LogoutEndpoint,
+    SessionEndpoint,
 )
 
 private fun Route.registerEndpoint(endpoint: Endpoint) {

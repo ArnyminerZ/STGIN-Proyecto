@@ -15,10 +15,7 @@ fun Application.installCORS() {
         if (host != null) {
             allowHost(host, schemes = listOf("http", "https"))
 
-            allowMethod(HttpMethod.Get)
-            allowMethod(HttpMethod.Post)
-            allowMethod(HttpMethod.Patch)
-            allowMethod(HttpMethod.Delete)
+            anyMethod()
 
             allowHeader(HttpHeaders.Authorization)
             allowHeader(HttpHeaders.ContentType)
