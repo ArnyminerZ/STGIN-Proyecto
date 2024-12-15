@@ -16,6 +16,9 @@ object StartMatchEndpoint: MatchBaseEndpoint("/start", HttpMethod.Post) {
         if (!match.isReady()) {
             respondFailure(Errors.MatchNotReady)
         }
+        if (match.startedAt != null) {
+            respondFailure(Errors.MatchAlreadyStarted)
+        }
 
         match.start(seed ?: 0)
 
