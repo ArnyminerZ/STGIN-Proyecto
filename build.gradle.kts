@@ -40,4 +40,6 @@ dependencies {
     implementation(libs.kotlinx.serialization)
 
     implementation(libs.logback)
+
+    testImplementation(libs.kotlin.test)
 }

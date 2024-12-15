@@ -1,6 +1,7 @@
 package com.arnyminerz.upv.game
 
 import kotlinx.serialization.Serializable
+import org.jetbrains.annotations.VisibleForTesting
 
 @Serializable
 data class PositionedBoat(
@@ -11,7 +12,8 @@ data class PositionedBoat(
     /**
      * Returns the positions of all the occupied cells by the boat.
      */
-    private fun occupiedCells(): Set<Position> {
+    @VisibleForTesting
+    fun occupiedCells(): Set<Position> {
         return (0 until boat.length)
             .map {
                 Position(
@@ -30,8 +32,8 @@ data class PositionedBoat(
      * @return True if the boat fits within the board boundaries, false otherwise.
      */
     fun fits(board: Board): Boolean {
-        val maxX = if (rotation == Rotation.HORIZONTAL) position.x + boat.length else position.x
-        val maxY = if (rotation == Rotation.VERTICAL) position.y + boat.length else position.y
+        val maxX = if (rotation == Rotation.HORIZONTAL) position.x + boat.length - 1 else position.x
+        val maxY = if (rotation == Rotation.VERTICAL) position.y + boat.length - 1 else position.y
 
         return maxY < board.rows && maxX < board.columns
     }

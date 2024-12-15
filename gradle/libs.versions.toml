@@ -14,6 +14,7 @@ exposed-javatime = { module = "org.jetbrains.exposed:exposed-java-time", version
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
 exposed-json = { module = "org.jetbrains.exposed:exposed-json", version.ref = "exposed" }
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 ktor-contentNegotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }

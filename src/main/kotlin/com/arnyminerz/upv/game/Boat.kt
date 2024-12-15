@@ -30,4 +30,6 @@ class Boat(
     override fun hashCode(): Int {
         return name.hashCode()
     }
+
+    override fun toString(): String = name
 }

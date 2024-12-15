@@ -21,17 +21,18 @@ data class Setup(
             val allBoats = Boat.all
             var setup = Setup(emptySet())
             for (boat in allBoats) {
+                val rotation = Rotation.entries.random(random)
                 while (true) {
-                    val x = random.nextInt(0, board.columns)
-                    val y = random.nextInt(0, board.rows)
+                    val x = random.nextInt(0, board.columns) - (if (rotation == Rotation.HORIZONTAL) boat.length - 1 else 0)
+                    val y = random.nextInt(0, board.rows) - (if (rotation == Rotation.VERTICAL) boat.length - 1 else 0)
                     val position = Position(x, y)
-                    val rotation = Rotation.entries.random(random)
 
+                    // In theory should fit, but check just in case
                     val positionedBoat = PositionedBoat(boat, position, rotation)
                     if (!positionedBoat.fits(board)) continue
 
                     val newSetup = setup.copy(positions = setup.positions + positionedBoat)
-                    if (!newSetup.anyCollision()) continue
+                    if (newSetup.anyCollision()) continue
 
                     setup = newSetup
                     break
@@ -58,6 +59,7 @@ data class Setup(
      * @return True if a collision is detected between any two boats, false otherwise.
      */
     fun anyCollision(): Boolean {
+        if (positions.size < 2) return false
         for (boat1 in positions) {
             for (boat2 in positions) {
                 if (boat1 == boat2) continue
