@@ -86,9 +86,14 @@ window.addEventListener('load', async () => {
     /** @type {HTMLDivElement} */
     const boatsElement = document.getElementById('boatsBox');
 
+    /**
+     * Joins the requested match by storing it into the session, and rendering the game.
+     * @param {Match} match
+     * @returns {Promise<void>}
+     */
     async function joinMatch(match) {
         setMatch(match);
-        await renderGame(username, match.game);
+        await renderGame(username, match);
     }
 
     newMatchButton.addEventListener('click', async () => {

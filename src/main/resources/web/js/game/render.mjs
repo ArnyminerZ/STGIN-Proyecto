@@ -109,12 +109,16 @@ function moveBoats(game, username) {
 
 /**
  * @param {string} username
- * @param {Game} game
+ * @param {Match} match
  */
-export async function renderGame(username, game) {
+export async function renderGame(username, match) {
+    const game = match.game;
+
     renderGrid(game);
 
-    allowDraggingBoats(game);
+    if (match.startedAt == null) {
+        allowDraggingBoats(game);
+    }
 
     moveBoats(game, username);
 }
