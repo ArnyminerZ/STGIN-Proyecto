@@ -1,6 +1,7 @@
 package com.arnyminerz.upv.game
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -92,7 +93,17 @@ class TestSetup {
     fun `test placeBoat`() {
         var setup = Setup(emptySet())
         assertTrue { setup.isEmpty() }
-        setup = setup.placeBoat(PositionedBoat(Boat("TestBoat", 2), Position(0, 0), Rotation.HORIZONTAL))
-        assertFalse { setup.isEmpty() }
+
+        // Place one boat
+        setup = setup.placeBoat(PositionedBoat(Boat("TestBoat1", 2), Position(0, 0), Rotation.HORIZONTAL))
+        assertEquals(1, setup.positions.size)
+
+        // Place another boat
+        setup = setup.placeBoat(PositionedBoat(Boat("TestBoat2", 2), Position(0, 0), Rotation.HORIZONTAL))
+        assertEquals(2, setup.positions.size)
+
+        // Place the first boat on another position
+        setup = setup.placeBoat(PositionedBoat(Boat("TestBoat1", 2), Position(2, 0), Rotation.HORIZONTAL))
+        assertEquals(2, setup.positions.size)
     }
 }

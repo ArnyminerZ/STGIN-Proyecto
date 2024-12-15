@@ -78,6 +78,8 @@ data class Setup(
     }
 
     fun placeBoat(boat: PositionedBoat): Setup {
-        return copy(positions = positions + boat)
+        val positions = positions.filterNot { it.boat == boat.boat }.toMutableSet()
+        positions.add(boat)
+        return copy(positions = positions)
     }
 }
