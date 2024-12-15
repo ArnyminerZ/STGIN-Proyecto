@@ -67,7 +67,7 @@ async function fetchMatches() {
 /** @type {number|null} */
 let matchId = null;
 
-async function placeBoat(boatId, column, row) {
+async function requestBoatPlacing(boatId, column, row) {
     const boatElement = document.getElementById(boatId);
     const boatName = boatElement.getAttribute('data-boat');
     const boatSize = parseInt(boatElement.getAttribute('data-size'));
@@ -81,6 +81,51 @@ async function placeBoat(boatId, column, row) {
     };
     const response = await post(`/api/matches/${matchId}/place`, body);
     return response.ok;
+}
+
+async function placeBoat(boatId, cellId) {
+    const boatElement = document.getElementById(boatId);
+    const cellElement = document.getElementById(cellId);
+    const [_, row, column] = cellId.split('-').map(Number);
+    if (row == null || column == null) {
+        // invalid cell id, probably dragged over a boat, ignore the drop
+        return false;
+    }
+
+    if (!await requestBoatPlacing(boatId, column, row)) {
+        return false;
+    }
+
+    cellElement.appendChild(boatElement);
+
+    return true;
+}
+
+async function rotateBoat(boatId) {
+    // 1 ->  0px
+    // 2 -> 15px
+    // 3 -> 30px
+    // 4 -> 45px
+    // 5 -> 60px
+    const boat = document.getElementById(boatId);
+    const size = parseInt(boat.getAttribute('data-size'));
+    const rotated = boat.getAttribute('data-rotated') === 'true';
+
+    function updateBoatElement(rotated) {
+        const rotation = rotated ? 0 : 90;
+        const translation = rotated ? 0 : ((size - 1) * 15);
+        boat.setAttribute('data-rotated', `${rotated}`);
+        boat.style.transform = `rotate(${rotation}deg) translate(${translation}px, ${translation}px)`;
+    }
+    updateBoatElement(!rotated);
+    console.log('Rotated', draggingId, 'by', rotated ? 0 : 90, 'degrees.');
+
+    if (!await requestBoatPlacing(boatId, 0, 0)) {
+        updateBoatElement(rotated);
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -129,21 +174,16 @@ function renderGame(game) {
         boat.draggable = true;
         boat.addEventListener('dragstart', dragStart);
         boat.addEventListener('dragend', dragStop);
-        boat.addEventListener('contextmenu', function (ev) {
+        boat.addEventListener('contextmenu', async function (ev) {
             ev.preventDefault();
-            // 1 ->  0px
-            // 2 -> 15px
-            // 3 -> 30px
-            // 4 -> 45px
-            // 5 -> 60px
-            const size = parseInt(boat.getAttribute('data-size'));
-            const rotated = boat.getAttribute('data-rotated') === 'true';
-            boat.setAttribute('data-rotated', `${!rotated}`);
-
-            const rotation = rotated ? 0 : 90;
-            const translation = rotated ? 0 : ((size - 1) * 15);
-            boat.style.transform = `rotate(${rotation}deg) translate(${translation}px, ${translation}px)`;
-            console.log('Rotated', draggingId, 'by', rotated ? 0 : 90, 'degrees.')
+            try {
+                loadingIndicator(true);
+                if (!await rotateBoat(boat.id)) {
+                    console.warn('Invalid boat rotation.')
+                }
+            } finally {
+                loadingIndicator(false);
+            }
         })
     }
 }
@@ -171,21 +211,11 @@ async function drop(ev) {
         ev.preventDefault();
 
         const draggedElementId = ev.dataTransfer.getData("text");
-        const draggedElement = document.getElementById(draggedElementId);
         const cellId = ev.target.id;
-        const [_, row, column] = cellId.split('-').map(Number);
-        if (row == null || column == null) {
-            // invalid cell id, probably dragged over a boat, ignore the drop
-            return;
-        }
 
-        if (!await placeBoat(draggedElementId, column, row)) {
+        if (!await placeBoat(draggedElementId, cellId)) {
             console.warn('Invalid boat placement.')
-            return;
         }
-
-        console.info(`Dropped ${draggedElementId} on ${ev.target.id}`);
-        ev.target.appendChild(draggedElement);
     } finally {
         loadingIndicator(false);
     }
