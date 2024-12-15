@@ -4,6 +4,7 @@
  * Set any of them to null to disable redirection.
  * @param {?string} loginRedirection The url to redirect to if the user is not logged in.
  * @param {?string} loggedRedirection The url to redirect to if the user is logged in.
+ * @return {?string} The currently logged-in user's username, or null if not logged in.
  */
 export async function checkSession(
     loginRedirection = '/login',
@@ -12,13 +13,15 @@ export async function checkSession(
     const response = await fetch('/api/auth/session', {
         method: 'GET',
     });
-    if (response.status === 200) {
+    if (response.ok) {
         if (loggedRedirection !== null) {
             window.location.href = loggedRedirection;
         }
+        return await response.text()
     } else {
         if (loginRedirection !== null) {
             window.location.href = loginRedirection;
         }
+        return null;
     }
 }

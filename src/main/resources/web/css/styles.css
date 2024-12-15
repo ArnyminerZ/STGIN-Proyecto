@@ -5,3 +5,18 @@ body {
 h1, h2, h3, h4, h5, h6 {
     font-family: "Lexend", sans-serif;
 }
+
+/* To indicate loading status */
+.shimmer {
+    color: grey;
+    display: inline-block;
+    mask: linear-gradient(-60deg, #000 30%, #0005, #000 70%) right/350% 100%;
+    animation: shimmer 2.5s infinite;
+    max-width: 200px;
+}
+
+@keyframes shimmer {
+    100% {
+        mask-position: left
+    }
+}

@@ -44,7 +44,7 @@ object LoginEndpoint : Endpoint("/api/auth/login", HttpMethod.Post) {
             }.id.value
         }
 
-        call.sessions.set(UserSessionData(sessionId))
+        call.sessions.set(UserSessionData(sessionId, username))
 
         respondSuccess()
     }
