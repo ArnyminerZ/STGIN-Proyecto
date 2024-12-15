@@ -4,6 +4,11 @@ import com.arnyminerz.upv.endpoint.auth.LoginEndpoint
 import com.arnyminerz.upv.endpoint.auth.LogoutEndpoint
 import com.arnyminerz.upv.endpoint.auth.RegisterEndpoint
 import com.arnyminerz.upv.endpoint.auth.SessionEndpoint
+import com.arnyminerz.upv.endpoint.game.MatchEndpoint
+import com.arnyminerz.upv.endpoint.game.MatchesEndpoint
+import com.arnyminerz.upv.endpoint.game.NewMatchEndpoint
+import com.arnyminerz.upv.endpoint.game.PlaceBoatMatchEndpoint
+import com.arnyminerz.upv.endpoint.game.StartMatchEndpoint
 import com.arnyminerz.upv.endpoint.type.Endpoint
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.Application
@@ -19,6 +24,13 @@ private val endpoints = listOf(
     LoginEndpoint,
     LogoutEndpoint,
     SessionEndpoint,
+
+    // Match endpoints
+    MatchesEndpoint,
+    MatchEndpoint,
+    NewMatchEndpoint,
+    StartMatchEndpoint,
+    PlaceBoatMatchEndpoint,
 )
 
 private fun Route.registerEndpoint(endpoint: Endpoint) {

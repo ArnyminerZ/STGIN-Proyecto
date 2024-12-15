@@ -1,5 +1,6 @@
 package com.arnyminerz.upv.database
 
+import com.arnyminerz.upv.database.table.Matches
 import com.arnyminerz.upv.database.table.UserSessions
 import com.arnyminerz.upv.database.table.Users
 import org.jetbrains.exposed.sql.Database
@@ -12,7 +13,7 @@ object ServerDatabase {
     private const val DRIVER_POSTGRES = "org.postgresql.Driver"
     private const val DRIVER_H2 = "org.h2.Driver"
 
-    private val tables = listOf(Users, UserSessions)
+    private val tables = listOf(Users, UserSessions, Matches)
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 

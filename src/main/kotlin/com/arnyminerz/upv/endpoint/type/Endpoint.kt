@@ -2,6 +2,7 @@ package com.arnyminerz.upv.endpoint.type
 
 import com.arnyminerz.upv.error.Error
 import com.arnyminerz.upv.error.Errors
+import com.arnyminerz.upv.plugins.json
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -17,6 +18,7 @@ import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.RoutingHandler
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlinx.serialization.SerializationStrategy
 
 abstract class Endpoint(val route: String, val method: HttpMethod = HttpMethod.Get) {
     val handler: RoutingHandler = { invoke() }
@@ -89,6 +91,17 @@ abstract class Endpoint(val route: String, val method: HttpMethod = HttpMethod.G
         statusCode: HttpStatusCode = HttpStatusCode.OK
     ) {
         call.respondText(text, status = statusCode)
+        throw RequestHandledException("Request succeeded.")
+    }
+
+    protected suspend inline fun <Type: Any> EndpointContext.respondSuccess(
+        body: Type,
+        serializer: SerializationStrategy<Type>,
+        statusCode: HttpStatusCode = HttpStatusCode.OK
+    ) {
+        val jsonBody  = json.encodeToString(serializer, body)
+        call.respondText(jsonBody, ContentType.Application.Json, statusCode)
+
         throw RequestHandledException("Request succeeded.")
     }
 

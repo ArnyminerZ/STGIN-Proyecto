@@ -32,6 +32,7 @@ dependencies {
     implementation(libs.exposed.dao)
     implementation(libs.exposed.javatime)
     implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.json)
     implementation(libs.h2)
     implementation(libs.postgresql)
 
