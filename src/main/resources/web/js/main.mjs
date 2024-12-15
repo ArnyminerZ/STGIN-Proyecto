@@ -1,7 +1,8 @@
 import {checkSession} from "./session.mjs";
 import {get, post} from "./requests.js";
 import {renderGame} from "./game/render.mjs";
-import {getMatchId, setMatchId} from "./game/storage.js";
+import {getMatch, setMatch} from "./game/storage.js";
+import {showSnackbar} from "./ui.mjs";
 
 /**
  * Creates a new match, optionally against a specific user.
@@ -16,6 +17,16 @@ async function newMatch(againstUserId = null) {
     return {status: response.status, response: await response.text()};
 }
 
+/**
+ * Requests a match to the server.
+ * @param {number} matchId
+ * @returns {Promise<null|Match>} A promise to the requested match, or null if not found.
+ */
+async function fetchMatch(matchId) {
+    const response = await get(`/api/matches/${matchId}`);
+    return response.ok ? await response.json() : null;
+}
+
 async function fetchMatches() {
     const response = await get('/api/matches');
     /** @type {int[]} */
@@ -24,9 +35,7 @@ async function fetchMatches() {
     const matches = [];
 
     for (const id of matchesIds) {
-        const response = await get(`/api/matches/${id}`);
-        /** @type {Match} */
-        const match = await response.json();
+        const match = await fetchMatch(id);
         matches.push(match);
     }
 
@@ -56,32 +65,29 @@ window.addEventListener('load', async () => {
 
     const matches = await fetchMatches();
     const pendingMatches = matches.filter(match => match.finishedAt == null);
+    const startedMatch = matches.find(match => match.startedAt != null && match.finishedAt == null);
 
     console.info(matches);
 
     /** @type {HTMLButtonElement} */
     const newMatchButton = document.getElementById('newMatchButton');
     /** @type {HTMLButtonElement} */
-    const joinMatchButton = document.getElementById('joinMatchButton');
-    /** @type {HTMLButtonElement} */
     const startMatchButton = document.getElementById('startMatchButton');
     /** @type {HTMLHeadElement} */
     const pendingMatchMessage = document.getElementById('pendingMatch');
     /** @type {HTMLHeadElement} */
     const pendingMatchAgainstMessage = document.getElementById('pendingMatchAgainst');
+    /** @type {HTMLHeadElement} */
+    const startedMatchMessage = document.getElementById('startedMatch');
+    /** @type {HTMLHeadElement} */
+    const startedMatchAgainstMessage = document.getElementById('startedMatchAgainst');
+    /** @type {HTMLDivElement} */
+    const boardElement = document.getElementById('board');
+    /** @type {HTMLDivElement} */
+    const boatsElement = document.getElementById('boatsBox');
 
     async function joinMatch(match) {
-        setMatchId(match.id);
-
-        joinMatchButton.setAttribute('disabled', 'true');
-        newMatchButton.setAttribute('disabled', 'true');
-
-        if (match.ready) {
-            startMatchButton.removeAttribute('disabled');
-        } else {
-            startMatchButton.setAttribute('disabled', 'true');
-        }
-
+        setMatch(match);
         await renderGame(username, match.game);
     }
 
@@ -90,28 +96,67 @@ window.addEventListener('load', async () => {
         window.location.reload();
     });
     startMatchButton.addEventListener('click', async () => {
-        await post(`/api/matches/${getMatchId()}/start`, {});
+        showSnackbar('Iniciando partida...');
+        const response = await post(`/api/matches/${getMatch().id}/start`, {});
+        if (response.ok) {
+            // TODO: Handle game start correctly
+            window.location.reload();
+        } else {
+            response.json().then(text => showSnackbar(JSON.stringify(text)));
+        }
     });
 
-    if (pendingMatches.length <= 0) {
-        newMatchButton.removeAttribute('disabled');
-        joinMatchButton.setAttribute('disabled', 'true');
+    console.log('Started match: ', startedMatch)
+
+    if (startedMatch != null) {
+        // There is a started match
+        newMatchButton.setAttribute('disabled', 'true');
+        startMatchButton.setAttribute('disabled', 'true');
 
         pendingMatchMessage.style.display = 'none';
+        pendingMatchAgainstMessage.innerText = '';
 
-        pendingMatchAgainstMessage.innerText = 'Nadie';
-        pendingMatchAgainstMessage.classList.remove('shimmer');
-    } else {
-        const match = pendingMatches[0];
+        startedMatchMessage.style.display = 'block';
+        startedMatchAgainstMessage.innerText = startedMatch.user2Id ?? 'La Máquina';
+
+        boardElement.style.display = 'block';
+        boatsElement.style.display = 'block';
+
+        // Join it automatically
+        await joinMatch(startedMatch);
+
+        document.getElementById('matchLoadingIndicator').style.display = 'none';
+    } else if (pendingMatches.length > 0) {
+        // There's at least a pending match
+        const pendingMatch = pendingMatches[0];
+
         newMatchButton.setAttribute('disabled', 'true');
-        joinMatchButton.removeAttribute('disabled');
+        startMatchButton.removeAttribute('disabled');
 
         pendingMatchMessage.style.display = 'block';
+        pendingMatchAgainstMessage.innerText = pendingMatch.user2Id ?? 'La Máquina';
 
-        pendingMatchAgainstMessage.innerText = match.user2Id ?? 'La Máquina';
-        pendingMatchAgainstMessage.classList.remove('shimmer');
+        startedMatchMessage.style.display = 'none';
+        startedMatchAgainstMessage.innerText = '';
 
-        console.info(match.game);
-        await joinMatch(match);
+        boardElement.style.display = 'block';
+        boatsElement.style.display = 'block';
+
+        // Join it automatically
+        await joinMatch(pendingMatch);
+
+        document.getElementById('matchLoadingIndicator').style.display = 'none';
+    } else {
+        // No games started or pending
+        newMatchButton.removeAttribute('disabled');
+        startMatchButton.setAttribute('disabled', 'true');
+
+        pendingMatchMessage.style.display = 'none';
+        startedMatchMessage.style.display = 'none';
+
+        boardElement.style.display = 'none';
+        boatsElement.style.display = 'none';
+
+        document.getElementById('matchLoadingIndicator').style.display = 'none';
     }
 });

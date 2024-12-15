@@ -44,6 +44,9 @@
     left: 5px;
     top: 5px;
 }
+.boat[draggable="true"] {
+    cursor: move;
+}
 .boat.speed {
     width: 30px; /* 30x1 */
     background-color: #5fbc33;

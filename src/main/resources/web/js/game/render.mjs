@@ -2,7 +2,7 @@ import {loadingIndicator, showSnackbar} from "../ui.mjs";
 import {BoatsDragging} from "./initial_dragging.mjs";
 import {rotateBoat, updateBoatElementRotation} from "./initial_setup.mjs";
 
-const GRID_SIZE = 30;
+export const GRID_SIZE = 30;
 
 /**
  * Calculates the size of a board in pixels based on its dimensions and a predefined grid size.
@@ -101,6 +101,8 @@ function moveBoats(game, username) {
         const boatElement = document.querySelector(`[data-boat=${positionedBoat.boat.name}]`);
         const cellElement = document.getElementById(`cell-${positionedBoat.position.y}-${positionedBoat.position.x}`);
         updateBoatElementRotation(boatElement, positionedBoat.rotation === 'VERTICAL');
+        boatElement.setAttribute('data-x', `${positionedBoat.position.x}`);
+        boatElement.setAttribute('data-y', `${positionedBoat.position.y}`);
         cellElement.appendChild(boatElement);
     }
 }

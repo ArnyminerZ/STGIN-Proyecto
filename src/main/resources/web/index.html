@@ -17,16 +17,18 @@
 <body>
 <h1>Juego de Barquitos</h1>
 <h2>Bienvenido de vuelta, <span id="username" class="shimmer">██████</span></h2>
-<h3 id="pendingMatch">Tienes una partida pendiente contra <span id="pendingMatchAgainst" class="shimmer">██████</span></h3>
+<h3 id="pendingMatch" style="display: none">Tienes una partida pendiente contra <span id="pendingMatchAgainst"></span></h3>
+<h3 id="startedMatch" style="display: none">Jugando contra <span id="startedMatchAgainst"></span></h3>
 
-<button id="joinMatchButton" disabled>Unirse</button>
 <button id="newMatchButton" disabled>Nueva Partida</button>
 <button id="startMatchButton" disabled>Iniciar Partida</button>
 
 <div id="loadingOverlay"></div>
 
-<div id="board"></div>
-<div id="boatsBox">
+<div id="matchLoadingIndicator" class="loader"></div>
+
+<div id="board" style="display: none"></div>
+<div id="boatsBox" style="display: none">
     <div id="speedBoat1" class="boat speed" data-boat="SpeedBoat1" data-size="1"></div>
     <div id="speedBoat2" class="boat speed" data-boat="SpeedBoat2" data-size="1"></div>
     <div id="sailBoat" class="boat sail" data-boat="SailBoat" data-size="2"></div>

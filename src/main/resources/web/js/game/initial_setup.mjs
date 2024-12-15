@@ -1,5 +1,6 @@
 import {post} from "../requests.js";
-import {getMatchId} from "./storage.js";
+import {getMatch} from "./storage.js";
+import {GRID_SIZE} from "./render.mjs";
 
 async function requestBoatPlacing(boatId, column, row) {
     const boatElement = document.getElementById(boatId);
@@ -13,7 +14,7 @@ async function requestBoatPlacing(boatId, column, row) {
             rotation: boatRotated ? 'VERTICAL' : 'HORIZONTAL'
         }
     };
-    const matchId = getMatchId();
+    const matchId = getMatch().id;
     const response = await post(`/api/matches/${matchId}/place`, body);
     return response.ok;
 }
@@ -31,6 +32,9 @@ export async function placeBoat(boatId, cellId) {
         return false;
     }
 
+    boatElement.setAttribute('data-x', `${column}`);
+    boatElement.setAttribute('data-y', `${row}`);
+
     cellElement.appendChild(boatElement);
 
     return true;
@@ -43,9 +47,9 @@ export async function placeBoat(boatId, cellId) {
  */
 export function updateBoatElementRotation(boat, rotated) {
     const size = parseInt(boat.getAttribute('data-size'));
-    const rotation = rotated ? 0 : 90;
-    const translation = rotated ? 0 : ((size - 1) * 15);
-    boat.setAttribute('data-rotated', `${!rotated}`);
+    const rotation = rotated ? 90 : 0;
+    const translation = rotated ? ((size - 1) * (GRID_SIZE / 2)) : 0;
+    boat.setAttribute('data-rotated', `${rotated}`);
     boat.style.transform = `rotate(${rotation}deg) translate(${translation}px, ${translation}px)`;
 }
 
@@ -60,7 +64,10 @@ export async function rotateBoat(boatId) {
 
     updateBoatElementRotation(boat, !rotated);
 
-    if (!await requestBoatPlacing(boatId, 0, 0)) {
+    const x = parseInt(boat.getAttribute('data-x'));
+    const y = parseInt(boat.getAttribute('data-y'));
+
+    if (!await requestBoatPlacing(boatId, x, y)) {
         updateBoatElementRotation(boat, rotated);
         return false;
     }
