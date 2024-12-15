@@ -25,7 +25,7 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
     var user1 by User referencedOn Matches.user1
     var user2 by User optionalReferencedOn Matches.user2
 
-    fun isReady(): Boolean = game.isReady(user2 == null)
+    fun isReady(): Boolean = ServerDatabase { game.isReady(user2 == null) }
 
     /**
      * Starts the match by performing necessary setup and validations.
@@ -46,9 +46,9 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
         startedAt = Instant.now()
     }
 
-    fun serializable(): SerializableMatch {
-        return SerializableMatch(
-            id.value,
+    fun serializable(): SerializableMatch = ServerDatabase {
+        SerializableMatch(
+            this@Match.id.value,
             createdAt.toEpochMilli(),
             isReady(),
             startedAt?.toEpochMilli(),
