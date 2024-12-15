@@ -93,6 +93,16 @@ async function fetchMatches() {
     return matches
 }
 
+/**
+ * Requests the server whether the match with the given id is ready or not.
+ * @param {number} matchId The id of the match to check.
+ * @returns {Promise<boolean>}
+ */
+async function isMatchReady(matchId) {
+    const response = await get(`/api/matches/${matchId}/is_ready`);
+    return await response.text() === 'YES';
+}
+
 /** @type {number|null} */
 let matchId = null;
 
@@ -130,13 +140,30 @@ async function placeBoat(boatId, cellId) {
 
     cellElement.appendChild(boatElement);
 
+    isMatchReady(matchId).then(ready => {
+        /** @type {HTMLButtonElement} */
+        const startMatchButton = document.getElementById('startMatchButton');
+
+        if (ready) {
+            startMatchButton.removeAttribute('disabled');
+        } else {
+            startMatchButton.setAttribute('disabled', 'true');
+        }
+    });
+
     return true;
 }
 
-function updateBoatElement(boat, rotated, size) {
+/**
+ * Updates the given boat element with the data provided. This is, transforming its CSS to match `rotated`.
+ * @param {HTMLDivElement} boat The boat element to update.
+ * @param {boolean} rotated If `true`, it means that the boat is vertical.
+ */
+function updateBoatElementRotation(boat, rotated) {
+    const size = parseInt(boat.getAttribute('data-size'));
     const rotation = rotated ? 0 : 90;
     const translation = rotated ? 0 : ((size - 1) * 15);
-    boat.setAttribute('data-rotated', `${rotated}`);
+    boat.setAttribute('data-rotated', `${!rotated}`);
     boat.style.transform = `rotate(${rotation}deg) translate(${translation}px, ${translation}px)`;
 }
 
@@ -147,14 +174,13 @@ async function rotateBoat(boatId) {
     // 4 -> 45px
     // 5 -> 60px
     const boat = document.getElementById(boatId);
-    const size = parseInt(boat.getAttribute('data-size'));
     const rotated = boat.getAttribute('data-rotated') === 'true';
 
-    updateBoatElement(boat, !rotated, size);
+    updateBoatElementRotation(boat, !rotated);
     console.log('Rotated', draggingId, 'by', rotated ? 0 : 90, 'degrees.');
 
     if (!await requestBoatPlacing(boatId, 0, 0)) {
-        updateBoatElement(boat, rotated, size);
+        updateBoatElementRotation(boat, rotated);
         return false;
     }
 
@@ -231,7 +257,7 @@ async function renderGame(game) {
         console.log('Positioning', positionedBoat.boat.name, 'at', positionedBoat.position.x, positionedBoat.position.y, 'with rotation', positionedBoat.rotation);
         const boatElement = document.querySelector(`[data-boat=${positionedBoat.boat.name}]`);
         const cellElement = document.getElementById(`cell-${positionedBoat.position.y}-${positionedBoat.position.x}`);
-        updateBoatElement(boatElement, positionedBoat.rotation === 'VERTICAL', positionedBoat.boat.length);
+        updateBoatElementRotation(boatElement, positionedBoat.rotation === 'VERTICAL');
         cellElement.appendChild(boatElement);
     }
 }
@@ -288,10 +314,27 @@ window.addEventListener('load', async () => {
     const newMatchButton = document.getElementById('newMatchButton');
     /** @type {HTMLButtonElement} */
     const joinMatchButton = document.getElementById('joinMatchButton');
+    /** @type {HTMLButtonElement} */
+    const startMatchButton = document.getElementById('startMatchButton');
     /** @type {HTMLHeadElement} */
     const pendingMatchMessage = document.getElementById('pendingMatch');
     /** @type {HTMLHeadElement} */
     const pendingMatchAgainstMessage = document.getElementById('pendingMatchAgainst');
+
+    async function joinMatch(match) {
+        matchId = match.id;
+
+        joinMatchButton.setAttribute('disabled', 'true');
+        newMatchButton.setAttribute('disabled', 'true');
+
+        if (match.ready) {
+            startMatchButton.removeAttribute('disabled');
+        } else {
+            startMatchButton.setAttribute('disabled', 'true');
+        }
+
+        await renderGame(match.game);
+    }
 
     newMatchButton.addEventListener('click', async () => {
         await newMatch();
@@ -316,7 +359,6 @@ window.addEventListener('load', async () => {
         pendingMatchAgainstMessage.classList.remove('shimmer');
 
         console.info(match.game);
-        matchId = match.id;
-        await renderGame(match.game);
+        await joinMatch(match);
     }
 });
