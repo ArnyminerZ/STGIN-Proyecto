@@ -5,6 +5,7 @@ import com.arnyminerz.upv.endpoint.auth.LogoutEndpoint
 import com.arnyminerz.upv.endpoint.auth.RegisterEndpoint
 import com.arnyminerz.upv.endpoint.auth.SessionEndpoint
 import com.arnyminerz.upv.endpoint.game.MatchEndpoint
+import com.arnyminerz.upv.endpoint.game.MatchReadyEndpoint
 import com.arnyminerz.upv.endpoint.game.MatchesEndpoint
 import com.arnyminerz.upv.endpoint.game.NewMatchEndpoint
 import com.arnyminerz.upv.endpoint.game.PlaceBoatMatchEndpoint
@@ -31,6 +32,7 @@ private val endpoints = listOf(
     NewMatchEndpoint,
     StartMatchEndpoint,
     PlaceBoatMatchEndpoint,
+    MatchReadyEndpoint,
 )
 
 private fun Route.registerEndpoint(endpoint: Endpoint) {
