@@ -1,7 +1,7 @@
 import {checkSession} from "./session.mjs";
 import {get, post} from "./requests.js";
 import {renderGame} from "./game/render.mjs";
-import {getMatch, setMatch} from "./game/storage.js";
+import {getMatch, setMatch, setUsername} from "./game/storage.js";
 import {showSnackbar} from "./ui.mjs";
 import {bomb} from "./game/playing.mjs";
 
@@ -59,6 +59,7 @@ let username = null;
 window.addEventListener('load', async () => {
     username = await checkSession('/login', null);
     if (username == null) return
+    setUsername(username);
 
     const usernameElement = document.getElementById('username');
     usernameElement.innerText = username;

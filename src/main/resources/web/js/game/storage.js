@@ -25,3 +25,26 @@ export function setMatch(match) {
 export function clearMatch() {
     sessionStorage.removeItem("match");
 }
+
+/**
+ * Fetches the stored username.
+ * @returns {string|null}
+ */
+export function getUsername() {
+    return sessionStorage.getItem("username");
+}
+
+/**
+ * Stores the user's name.
+ * @param {string} username
+ */
+export function setUsername(username) {
+    sessionStorage.setItem("username", username);
+}
+
+/**
+ * Clears the stored username.
+ */
+export function clearUsername() {
+    sessionStorage.removeItem("username");
+}

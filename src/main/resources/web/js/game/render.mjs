@@ -1,6 +1,8 @@
 import {loadingIndicator, showSnackbar} from "../ui.mjs";
 import {BoatsDragging} from "./initial_dragging.mjs";
 import {rotateBoat, updateBoatElementRotation} from "./initial_setup.mjs";
+import {equalPositions, positionHitsBoat} from "./math.mjs";
+import {opponent, opponentBombs, userBoats} from "./lookup.js";
 
 /**
  * @callback ClickCellCallback
@@ -28,16 +30,18 @@ function calculateBoardSizePx(board) {
  * Creates all the div elements that compose the main playing grid, where each boat can be placed.
  * @param {HTMLDivElement} boardElement
  * @param {Game} game
+ * @param {string} username
  * @param {?ClickCellCallback} onClickCell
  * @param {boolean} isEnabled
- * @param {boolean} leftPadding
+ * @param {boolean} applyLeftPadding
  */
 function renderGrid(
     boardElement,
     game,
+    username,
     onClickCell,
     isEnabled = false,
-    leftPadding = false
+    applyLeftPadding = false
 ) {
     const board = game.board;
     console.log('Board size is', board.columns, 'columns x', board.rows, 'rows.')
@@ -46,18 +50,34 @@ function renderGrid(
     boardElement.style.width = `${boardWidthPx}px`;
     boardElement.style.height = `${boardHeightPx}px`;
 
-    if (leftPadding) {
+    if (applyLeftPadding) {
         boardElement.style.marginLeft = `${boardWidthPx + 50}px`;
     }
 
-    // Remove all children
-    boardElement.childNodes.forEach(child => child.remove());
+    /** @type {Position[]|null} */
+    const otherBombs = opponentBombs(game, username);
+    /** @type {PositionedBoat[]|null} */
+    const boats = userBoats(game, username);
 
     // Generate the grid
     for (let row = 0; row < board.rows; row++) {
         for (let column = 0; column < board.columns; column++) {
+            /** @type {Position} */
+            const position = {x: column, y: row};
             const cellElement = document.createElement('div');
             cellElement.classList.add('cell');
+
+            /** @type {Position|null} */
+            const bomb = otherBombs?.find((pos) => equalPositions(pos, position));
+            if (bomb != null) {
+                cellElement.classList.add('bomb');
+
+                // check if the bomb hits a boat
+                const hits = boats?.some((/** @type {PositionedBoat} */ boat) => positionHitsBoat(boat, position)) ?? false;
+                if (hits) {
+                    cellElement.classList.add('hit');
+                }
+            }
 
             cellElement.setAttribute('data-active', `${isEnabled}`);
 
@@ -68,7 +88,7 @@ function renderGrid(
             cellElement.style.top = `${row * GRID_SIZE - 1}px`;
             cellElement.style.overflow = 'visible';
 
-            cellElement.id = `cell-${row}-${column}`;
+            cellElement.id = `cell-${row}-${column}-${username}`;
             cellElement.addEventListener('drop', BoatsDragging.drop);
             cellElement.addEventListener('dragover', BoatsDragging.allowDrop);
 
@@ -78,6 +98,17 @@ function renderGrid(
 
             boardElement.appendChild(cellElement);
         }
+    }
+}
+
+/**
+ * Removes all existing cells.
+ */
+function resetCells() {
+    const cells = document.getElementsByClassName('cell');
+    // strange workaround, because for some reason for-loops do not work correctly
+    while(cells[0]) {
+        cells[0].parentNode.removeChild(cells[0]);
     }
 }
 
@@ -111,6 +142,13 @@ function allowDraggingBoats(game) {
     }
 }
 
+function forbidDraggingBoats() {
+    const boats = document.getElementsByClassName('boat');
+    for (/** @type {HTMLDivElement} */ const boat of boats) {
+        boat.draggable = false;
+    }
+}
+
 /**
  * Moves all the boats to their respective positions according to `game`.
  * @param {Game} game
@@ -124,13 +162,28 @@ function moveBoats(game, username) {
         return
     }
     for (const positionedBoat of setup.positions) {
-        console.log('Positioning', positionedBoat.boat.name, 'at', positionedBoat.position.x, positionedBoat.position.y, 'with rotation', positionedBoat.rotation);
         const boatElement = document.querySelector(`[data-boat=${positionedBoat.boat.name}]`);
-        const cellElement = document.getElementById(`cell-${positionedBoat.position.y}-${positionedBoat.position.x}`);
+        if (boatElement == null) {
+            console.error('Could not find boat', positionedBoat.boat.name);
+            continue;
+        }
+        const cellElement = document.getElementById(`cell-${positionedBoat.position.y}-${positionedBoat.position.x}-${username}`);
         updateBoatElementRotation(boatElement, positionedBoat.rotation === 'VERTICAL');
         boatElement.setAttribute('data-x', `${positionedBoat.position.x}`);
         boatElement.setAttribute('data-y', `${positionedBoat.position.y}`);
         cellElement.appendChild(boatElement);
+    }
+}
+
+/**
+ * Moves all boats back to the boats box.
+ */
+function resetBoats() {
+    const boatsBox = document.getElementById('boatsBox');
+    /** @type {HTMLDivElement[]} */
+    const boats = [].slice.call(document.getElementsByClassName('boat'));
+    for (const boat of boats) {
+        boatsBox.appendChild(boat);
     }
 }
 
@@ -145,14 +198,23 @@ export async function renderGame(username, match, onClickCell) {
 
     const boardElement = document.getElementById('board');
     const opponentBoardElement = document.getElementById('opponentBoard');
-    renderGrid(boardElement, game, null, !hasStarted);
+    const opponentUsername = opponent(game, username);
+
+    resetBoats();
+    resetCells();
+
+    renderGrid(boardElement, game, username, null, !hasStarted);
     if (hasStarted) {
-        renderGrid(opponentBoardElement, game, onClickCell, true, true);
+        renderGrid(opponentBoardElement, game, opponentUsername, onClickCell, true, true);
         opponentBoardElement.style.display = 'block';
+    } else {
+        opponentBoardElement.style.display = 'none';
     }
 
     if (match.startedAt == null) {
         allowDraggingBoats(game);
+    } else {
+        forbidDraggingBoats();
     }
 
     moveBoats(game, username);
