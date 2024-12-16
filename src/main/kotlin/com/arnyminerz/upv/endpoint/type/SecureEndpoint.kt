@@ -1,9 +1,7 @@
 package com.arnyminerz.upv.endpoint.type
 
 import com.arnyminerz.upv.cache.CacheRepository
-import com.arnyminerz.upv.database.entity.User
 import com.arnyminerz.upv.error.Errors
-import com.arnyminerz.upv.performance.measurePerformance
 import com.arnyminerz.upv.plugins.UserSession
 import io.ktor.http.HttpMethod
 import io.ktor.server.sessions.get
