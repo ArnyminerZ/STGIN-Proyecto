@@ -4,6 +4,7 @@ import {rotateBoat, updateBoatElementRotation} from "./initial_setup.mjs";
 
 /**
  * @callback ClickCellCallback
+ * @async
  * @param {number} x
  * @param {number} y
  */
@@ -72,7 +73,7 @@ function renderGrid(
             cellElement.addEventListener('dragover', BoatsDragging.allowDrop);
 
             if (onClickCell != null) {
-                cellElement.addEventListener('click', () => onClickCell(column, row));
+                cellElement.addEventListener('click', async () => await onClickCell(column, row));
             }
 
             boardElement.appendChild(cellElement);

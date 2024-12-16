@@ -28,14 +28,14 @@ data class Game(
      * - A position cannot be bombed twice.
      * @param player The player that is throwing the bomb.
      * @param position The position to throw the bomb at.
-     * @return `true` if the position is a hit.
+     * @return The updated game instance.
      * @throws NotYourTurnException If [player] is not the one that should make a move.
      * @throws PositionOutOfBoundsException If [position] is out of the [board]'s bounds.
      * @throws ForbiddenPositionException One of:
      * - The player is trying to hit its own boat.
      * - The player is trying to hit a position that already has a bomb.
      */
-    fun bomb(player: Player, position: Position): Boolean {
+    fun bomb(player: Player, position: Position): Game {
         if (turn() != player) {
             throw NotYourTurnException()
         }
@@ -54,11 +54,10 @@ data class Game(
             throw ForbiddenPositionException("Already has a bomb.")
         }
 
-        if (player == Player.PLAYER1) {
-            player1Bombs += position
+        return if (player == Player.PLAYER1) {
+            copy(player1Bombs = player1Bombs + position)
         } else {
-            player2Bombs += position
+            copy(player2Bombs = player2Bombs + position)
         }
-        return setup(player.other()).hitsAnyBoat(position)
     }
 }

@@ -42,4 +42,16 @@ object Errors {
 
     @Serializable
     data object NotYourMatch : Error(13, "You are not in this match.", HttpStatusCode.Forbidden)
+
+    @Serializable
+    data object MatchNotStarted : Error(14, "Match not started.")
+
+    @Serializable
+    data object MatchAlreadyFinished : Error(15, "Match already finished.")
+
+    @Serializable
+    data object InvalidPosition : Error(16, "Invalid position.")
+
+    @Serializable
+    data object NotYourTurn : Error(17, "It's not your turn.", HttpStatusCode.Conflict)
 }
