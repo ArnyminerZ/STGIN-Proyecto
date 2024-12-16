@@ -3,6 +3,7 @@ import {get, post} from "./requests.js";
 import {renderGame} from "./game/render.mjs";
 import {getMatch, setMatch} from "./game/storage.js";
 import {showSnackbar} from "./ui.mjs";
+import {bomb} from "./game/playing.mjs";
 
 /**
  * Creates a new match, optionally against a specific user.
@@ -93,7 +94,7 @@ window.addEventListener('load', async () => {
      */
     async function joinMatch(match) {
         setMatch(match);
-        await renderGame(username, match);
+        await renderGame(username, match, bomb);
     }
 
     newMatchButton.addEventListener('click', async () => {

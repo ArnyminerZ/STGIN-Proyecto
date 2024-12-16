@@ -2,6 +2,13 @@ import {loadingIndicator, showSnackbar} from "../ui.mjs";
 import {BoatsDragging} from "./initial_dragging.mjs";
 import {rotateBoat, updateBoatElementRotation} from "./initial_setup.mjs";
 
+/**
+ * @callback ClickCellCallback
+ * @param {number} x
+ * @param {number} y
+ */
+
+/** */
 export const GRID_SIZE = 30;
 
 /**
@@ -18,16 +25,29 @@ function calculateBoardSizePx(board) {
 
 /**
  * Creates all the div elements that compose the main playing grid, where each boat can be placed.
+ * @param {HTMLDivElement} boardElement
  * @param {Game} game
+ * @param {?ClickCellCallback} onClickCell
+ * @param {boolean} isEnabled
+ * @param {boolean} leftPadding
  */
-function renderGrid(game) {
+function renderGrid(
+    boardElement,
+    game,
+    onClickCell,
+    isEnabled = false,
+    leftPadding = false
+) {
     const board = game.board;
     console.log('Board size is', board.columns, 'columns x', board.rows, 'rows.')
     const [boardWidthPx, boardHeightPx] = calculateBoardSizePx(board);
 
-    const boardElement = document.getElementById('board');
     boardElement.style.width = `${boardWidthPx}px`;
     boardElement.style.height = `${boardHeightPx}px`;
+
+    if (leftPadding) {
+        boardElement.style.marginLeft = `${boardWidthPx + 50}px`;
+    }
 
     // Remove all children
     boardElement.childNodes.forEach(child => child.remove());
@@ -37,6 +57,8 @@ function renderGrid(game) {
         for (let column = 0; column < board.columns; column++) {
             const cellElement = document.createElement('div');
             cellElement.classList.add('cell');
+
+            cellElement.setAttribute('data-active', `${isEnabled}`);
 
             cellElement.style.position = 'absolute';
             cellElement.style.width = `${GRID_SIZE}px`;
@@ -48,6 +70,10 @@ function renderGrid(game) {
             cellElement.id = `cell-${row}-${column}`;
             cellElement.addEventListener('drop', BoatsDragging.drop);
             cellElement.addEventListener('dragover', BoatsDragging.allowDrop);
+
+            if (onClickCell != null) {
+                cellElement.addEventListener('click', () => onClickCell(column, row));
+            }
 
             boardElement.appendChild(cellElement);
         }
@@ -110,11 +136,19 @@ function moveBoats(game, username) {
 /**
  * @param {string} username
  * @param {Match} match
+ * @param {ClickCellCallback} onClickCell Called when the game has started, and the user clicks on an opponent's cell.
  */
-export async function renderGame(username, match) {
+export async function renderGame(username, match, onClickCell) {
     const game = match.game;
+    const hasStarted = match.startedAt != null;
 
-    renderGrid(game);
+    const boardElement = document.getElementById('board');
+    const opponentBoardElement = document.getElementById('opponentBoard');
+    renderGrid(boardElement, game, null, !hasStarted);
+    if (hasStarted) {
+        renderGrid(opponentBoardElement, game, onClickCell, true, true);
+        opponentBoardElement.style.display = 'block';
+    }
 
     if (match.startedAt == null) {
         allowDraggingBoats(game);

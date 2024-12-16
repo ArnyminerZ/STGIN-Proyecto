@@ -10,18 +10,18 @@
     top: 0;
 }
 
-#board {
+.board {
     position: absolute;
     background-color: #3a93dc;
     margin: 10px;
 }
 
-#board .cell {
+.board .cell {
     border: 1px solid black;
     background-color: #3a93dc;
 }
 
-#board .cell:hover {
+.board .cell[data-active="true"]:hover {
     background-color: #2d73a5;
 }
 
