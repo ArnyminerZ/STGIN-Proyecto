@@ -34,12 +34,12 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
      * of the second player's setup if they are not present.
      * @throws IllegalStateException If the match is not ready to start, as determined by the `isReady` method.
      */
-    fun start(seed: Int = 0) = ServerDatabase {
+    fun start() = ServerDatabase {
         check(isReady()) { "The game is not ready to start!" }
 
         if (user2 == null) {
             // randomize the game
-            game = game.copy(setupPlayer2 = Setup.random(game.board, seed))
+            game = game.copy(setupPlayer2 = Setup.random(game.board))
         }
 
         startedAt = Instant.now()

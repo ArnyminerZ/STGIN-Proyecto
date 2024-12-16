@@ -1,5 +1,6 @@
 package com.arnyminerz.upv.endpoint.game
 
+import com.arnyminerz.upv.ai.MachineActions
 import com.arnyminerz.upv.database.ServerDatabase
 import com.arnyminerz.upv.database.entity.Match
 import com.arnyminerz.upv.endpoint.type.EndpointContext
@@ -36,7 +37,7 @@ object BombEndpoint : MatchBaseEndpoint("/bomb/{x}/{y}", HttpMethod.Post) {
         }
         val position = Position(x!!, y!!)
 
-        val game = try {
+        var game = try {
             match.game.bomb(player, position)
         } catch (_: NotYourTurnException) {
             respondFailure(Errors.NotYourTurn)
@@ -47,6 +48,12 @@ object BombEndpoint : MatchBaseEndpoint("/bomb/{x}/{y}", HttpMethod.Post) {
         } catch (_: ForbiddenPositionException) {
             respondFailure(Errors.ForbiddenPosition)
             match.game // ignored
+        }
+
+        // If the second player is a machine, perform a bombing
+        val isVsMachine = ServerDatabase { match.user2 == null }
+        if (isVsMachine) {
+            game = MachineActions.randomBomb(game)
         }
 
         val hit = game.setup(player.other()).hitsAnyBoat(position)

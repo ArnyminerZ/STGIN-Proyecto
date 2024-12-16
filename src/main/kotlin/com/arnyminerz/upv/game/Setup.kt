@@ -14,11 +14,10 @@ data class Setup(
          * Ensures that all boats fit within the board boundaries and do not overlap.
          *
          * @param board The board on which the boats will be positioned.
-         * @param seed The seed value used for random number generation. Defaults to 0.
          * @return A random [Setup] containing all boats positioned on the board.
          */
-        fun random(board: Board, seed: Int = 0): Setup {
-            val random = Random(seed)
+        fun random(board: Board): Setup {
+            val random = Random(board.seed)
             val allBoats = Boat.all
             var setup = Setup(emptySet())
             for (boat in allBoats) {

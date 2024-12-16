@@ -23,9 +23,7 @@ data class Game(
 
     /**
      * Throws a bomb as the given player on the specified position.
-     * Performs the following checks:
-     * - A player cannot bomb its own boats.
-     * - A position cannot be bombed twice.
+     * Makes sure that a position is not bombed twice.
      * @param player The player that is throwing the bomb.
      * @param position The position to throw the bomb at.
      * @return The updated game instance.
@@ -42,11 +40,6 @@ data class Game(
 
         if (!board.inBounds(position)) {
             throw PositionOutOfBoundsException()
-        }
-
-        val setup = setup(player)
-        if (setup.hitsAnyBoat(position)) {
-            throw ForbiddenPositionException("You cannot hit your own boat.")
         }
 
         val bombs = bombs(player)

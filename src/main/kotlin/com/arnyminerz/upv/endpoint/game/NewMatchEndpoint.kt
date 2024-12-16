@@ -13,8 +13,6 @@ import com.arnyminerz.upv.game.Setup
 import com.arnyminerz.upv.request.NewMatchRequest
 import io.ktor.http.HttpMethod
 import io.ktor.server.request.receive
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.serializer
 import org.jetbrains.exposed.sql.and
 
 /**
@@ -22,6 +20,9 @@ import org.jetbrains.exposed.sql.and
  */
 object NewMatchEndpoint : SecureEndpoint("/api/matches", HttpMethod.Post) {
     override suspend fun EndpointContext.secureBody(userId: String) {
+        val parameters = call.parameters
+        val seed = parameters["seed"]?.toIntOrNull() ?: 0
+
         val body = call.receive(NewMatchRequest::class)
         val (user2Id) = body
 
@@ -53,7 +54,7 @@ object NewMatchEndpoint : SecureEndpoint("/api/matches", HttpMethod.Post) {
 
         // Generate the game
         val game = Game(
-            board = Board(),
+            board = Board(seed),
             setupPlayer1 = Setup.empty(userId),
             setupPlayer2 = Setup.empty(user2Id),
         )
