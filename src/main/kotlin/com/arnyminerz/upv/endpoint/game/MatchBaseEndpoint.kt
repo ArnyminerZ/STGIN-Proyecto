@@ -7,6 +7,7 @@ import com.arnyminerz.upv.database.table.Matches
 import com.arnyminerz.upv.endpoint.type.EndpointContext
 import com.arnyminerz.upv.endpoint.type.SecureEndpoint
 import com.arnyminerz.upv.error.Errors
+import com.arnyminerz.upv.performance.measurePerformance
 import com.arnyminerz.upv.response.SerializableMatch
 import io.ktor.http.HttpMethod
 import io.ktor.server.util.getOrFail
@@ -24,7 +25,7 @@ abstract class MatchBaseEndpoint(
     operation: String,
     httpMethod: HttpMethod = HttpMethod.Post
 ): SecureEndpoint("/api/matches/{id}$operation", httpMethod) {
-    final override suspend fun EndpointContext.secureBody(user: User) {
+    final override suspend fun EndpointContext.secureBody(userId: String) {
         val matchId = call.parameters["id"]?.toIntOrNull()
         if (matchId == null) {
             respondFailure(Errors.MatchNotFound)
@@ -37,8 +38,8 @@ abstract class MatchBaseEndpoint(
         }
         match!! // will not be null
 
-        matchBody(user, match)
+        matchBody(userId, match)
     }
 
-    protected abstract suspend fun EndpointContext.matchBody(user: User, match: Match)
+    protected abstract suspend fun EndpointContext.matchBody(userId: String, match: Match)
 }

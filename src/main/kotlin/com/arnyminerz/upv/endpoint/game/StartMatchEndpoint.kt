@@ -10,7 +10,7 @@ import io.ktor.http.HttpMethod
  * Requests the server to start the match.
  */
 object StartMatchEndpoint: MatchBaseEndpoint("/start", HttpMethod.Post) {
-    override suspend fun EndpointContext.matchBody(user: User, match: Match) {
+    override suspend fun EndpointContext.matchBody(userId: String, match: Match) {
         val seed = call.request.queryParameters["seed"]?.toIntOrNull()
 
         if (!match.isReady()) {

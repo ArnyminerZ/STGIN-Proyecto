@@ -3,6 +3,7 @@ exposed = "0.57.0"
 h2 = "2.2.224"
 kotlin = "2.1.0"
 kotlinx-serialization = "1.7.3"
+kreds = "0.9.1"
 ktor = "3.0.2"
 logback = "1.4.14"
 postgresql = "42.7.2"
@@ -16,6 +17,7 @@ exposed-json = { module = "org.jetbrains.exposed:exposed-json", version.ref = "e
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kreds = { module = "io.github.crackthecodeabhi:kreds", version.ref = "kreds" }
 ktor-contentNegotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }

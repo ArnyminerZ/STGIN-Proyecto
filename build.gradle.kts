@@ -39,7 +39,11 @@ dependencies {
     // KotlinX Serialization
     implementation(libs.kotlinx.serialization)
 
+    // Logging
     implementation(libs.logback)
+
+    // Redis Client
+    implementation(libs.kreds)
 
     testImplementation(libs.kotlin.test)
 }

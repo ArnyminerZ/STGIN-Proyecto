@@ -16,12 +16,12 @@ import io.ktor.server.request.receiveText
  * Requests the server to start the match.
  */
 object PlaceBoatMatchEndpoint : MatchBaseEndpoint("/place", HttpMethod.Post) {
-    override suspend fun EndpointContext.matchBody(user: User, match: Match) {
+    override suspend fun EndpointContext.matchBody(userId: String, match: Match) {
         if (match.startedAt != null) {
             respondFailure(Errors.MatchAlreadyStarted)
         }
 
-        val player = match.player(user.id.value)
+        val player = match.player(userId)
         if (player == null) {
             respondFailure(Errors.NotYourMatch)
         }

@@ -7,13 +7,16 @@ import io.ktor.server.sessions.Sessions
 import io.ktor.server.sessions.cookie
 import io.ktor.util.hex
 import java.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import kotlinx.serialization.Serializable
 
 private const val SessionDuration: Long = 30 * 24 * 60 * 60
 
 @Serializable
+@ExperimentalUuidApi
 data class UserSession(
-    val id: Int,
+    val uuid: Uuid,
     val username: String,
     val createdAt: Long = System.currentTimeMillis()
 ) {
@@ -22,6 +25,7 @@ data class UserSession(
     fun isExpired(): Boolean = expiresAt() < Instant.now()
 }
 
+@OptIn(ExperimentalUuidApi::class)
 fun Application.installSessions() {
     val secretEncryptKey = hex("00112233445566778899aabbccddeeff")
     val secretSignKey = hex("6819b57a326945c1968f45236589")

@@ -21,12 +21,12 @@ import org.jetbrains.exposed.sql.and
  * Returns a list of all the matches being currently played by the logged-in user.
  */
 object NewMatchEndpoint : SecureEndpoint("/api/matches", HttpMethod.Post) {
-    override suspend fun EndpointContext.secureBody(user: User) {
+    override suspend fun EndpointContext.secureBody(userId: String) {
         val body = call.receive(NewMatchRequest::class)
         val (user2Id) = body
 
         // Make sure the user is not challenging itself
-        if (user.id.value == user2Id) {
+        if (userId == user2Id) {
             respondFailure(Errors.CannotMatchAgainstYourself)
         }
 
@@ -42,7 +42,7 @@ object NewMatchEndpoint : SecureEndpoint("/api/matches", HttpMethod.Post) {
         // Check if already has an unfinished match against the requested player.
         val anyUnfinishedMatch = ServerDatabase {
             Match.find {
-                (Matches.user1 eq user.id) and (Matches.user2 eq user2Id) and
+                (Matches.user1 eq userId) and (Matches.user2 eq user2Id) and
                     // The game has not been finished
                     (Matches.finishedAt.isNull())
             }.limit(1).count() > 0
@@ -54,7 +54,7 @@ object NewMatchEndpoint : SecureEndpoint("/api/matches", HttpMethod.Post) {
         // Generate the game
         val game = Game(
             board = Board(),
-            setupPlayer1 = Setup.empty(user.id.value),
+            setupPlayer1 = Setup.empty(userId),
             setupPlayer2 = Setup.empty(user2Id),
         )
 
@@ -62,7 +62,7 @@ object NewMatchEndpoint : SecureEndpoint("/api/matches", HttpMethod.Post) {
         ServerDatabase {
             Match.new {
                 this.game = game
-                this.user1 = user
+                this.user1 = User.findById(userId)!!
                 this.user2 = user2
             }
         }

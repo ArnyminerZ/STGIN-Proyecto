@@ -1,15 +1,17 @@
 package com.arnyminerz.upv.endpoint.type
 
-import com.arnyminerz.upv.database.ServerDatabase
+import com.arnyminerz.upv.cache.CacheRepository
 import com.arnyminerz.upv.database.entity.User
 import com.arnyminerz.upv.error.Errors
+import com.arnyminerz.upv.performance.measurePerformance
 import com.arnyminerz.upv.plugins.UserSession
 import io.ktor.http.HttpMethod
 import io.ktor.server.sessions.get
 import io.ktor.server.sessions.sessions
-import java.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
 
 abstract class SecureEndpoint(route: String, method: HttpMethod = HttpMethod.Post): Endpoint(route, method) {
+    @OptIn(ExperimentalUuidApi::class)
     final override suspend fun EndpointContext.body() {
         // Get the session
         val session = call.sessions.get<UserSession>()
@@ -18,19 +20,20 @@ abstract class SecureEndpoint(route: String, method: HttpMethod = HttpMethod.Pos
         if (session == null || session.isExpired()) {
             respondFailure(Errors.NotLoggedIn)
         }
+        session!! // won't be null
 
         // If it's not null, the user is logged in, but the session may no longer be valid, so check on the database
-        val userSession = ServerDatabase { com.arnyminerz.upv.database.entity.UserSession.findById(session!!.id) }
+        val userSession = CacheRepository.getSessionByUUID(session.uuid)
         if (userSession == null) {
             respondFailure(Errors.NotLoggedIn)
         }
+        userSession!! // won't be null
 
         // Update the last seen
-        ServerDatabase { userSession!!.lastSeen = Instant.now() }
+        CacheRepository.updateLastSeen(userSession)
 
-        val user = ServerDatabase { userSession!!.user }
-        secureBody(user)
+        secureBody(userSession.userId)
     }
 
-    protected abstract suspend fun EndpointContext.secureBody(user: User)
+    protected abstract suspend fun EndpointContext.secureBody(userId: String)
 }
