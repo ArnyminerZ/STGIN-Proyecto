@@ -10,8 +10,8 @@ data class Game(
     val board: Board,
     val setupPlayer1: Setup,
     val setupPlayer2: Setup,
-    private var player1Bombs: Set<Position> = emptySet(),
-    private var player2Bombs: Set<Position> = emptySet(),
+    private val player1Bombs: Set<Position> = emptySet(),
+    private val player2Bombs: Set<Position> = emptySet(),
 ) {
     fun isReady(vsMachine: Boolean): Boolean = setupPlayer1.isReady() && (vsMachine || setupPlayer2.isReady())
 

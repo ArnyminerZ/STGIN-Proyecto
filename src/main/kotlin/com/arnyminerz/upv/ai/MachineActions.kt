@@ -8,6 +8,9 @@ import com.arnyminerz.upv.game.Position
 object MachineActions {
     fun aiBomb(game: Game): Game = randomBomb(game)
 
+    /**
+     * Places a random bomb in an available space, and returns the updated game.
+     */
     private fun randomBomb(game: Game): Game {
         var position = Position.random(game.board)
         var newGame: Game? = null
