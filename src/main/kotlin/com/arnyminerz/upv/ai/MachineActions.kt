@@ -6,7 +6,9 @@ import com.arnyminerz.upv.game.Player
 import com.arnyminerz.upv.game.Position
 
 object MachineActions {
-    fun randomBomb(game: Game): Game {
+    fun aiBomb(game: Game): Game = randomBomb(game)
+
+    private fun randomBomb(game: Game): Game {
         var position = Position.random(game.board)
         var newGame: Game? = null
         while (newGame == null) {

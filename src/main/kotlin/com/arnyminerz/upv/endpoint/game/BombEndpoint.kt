@@ -8,6 +8,8 @@ import com.arnyminerz.upv.error.Errors
 import com.arnyminerz.upv.exception.ForbiddenPositionException
 import com.arnyminerz.upv.exception.NotYourTurnException
 import com.arnyminerz.upv.exception.PositionOutOfBoundsException
+import com.arnyminerz.upv.game.Game
+import com.arnyminerz.upv.game.Player
 import com.arnyminerz.upv.game.Position
 import io.ktor.http.HttpMethod
 
@@ -37,23 +39,13 @@ object BombEndpoint : MatchBaseEndpoint("/bomb/{x}/{y}", HttpMethod.Post) {
         }
         val position = Position(x!!, y!!)
 
-        var game = try {
-            match.game.bomb(player, position)
-        } catch (_: NotYourTurnException) {
-            respondFailure(Errors.NotYourTurn)
-            match.game // ignored
-        } catch (_: PositionOutOfBoundsException) {
-            respondFailure(Errors.PositionOutOfBounds)
-            match.game // ignored
-        } catch (_: ForbiddenPositionException) {
-            respondFailure(Errors.ForbiddenPosition)
-            match.game // ignored
-        }
+        val isVsMachine = ServerDatabase { match.user2 == null }
+
+        var game = bomb(match.game, player, position, isVsMachine)
 
         // If the second player is a machine, perform a bombing
-        val isVsMachine = ServerDatabase { match.user2 == null }
         if (isVsMachine) {
-            game = MachineActions.randomBomb(game)
+            game = MachineActions.aiBomb(game)
         }
 
         val hit = game.setup(player.other()).hitsAnyBoat(position)
@@ -62,5 +54,29 @@ object BombEndpoint : MatchBaseEndpoint("/bomb/{x}/{y}", HttpMethod.Post) {
         ServerDatabase { match.game = game }
 
         respondSuccess(if (hit) "HIT" else "MISS")
+    }
+
+    private suspend fun EndpointContext.bomb(game: Game, player: Player, position: Position, isVsMachine: Boolean): Game {
+        return try {
+            game.bomb(player, position)
+        } catch (_: NotYourTurnException) {
+            // If not the user's turn, but vs a machine, it means that for some reason the movement of the machine
+            // was not made. Make it and call the body again
+            if (isVsMachine) {
+                // perform a bombing as the AI
+                val newGame = MachineActions.aiBomb(game)
+                // call bomb again
+                bomb(newGame, player, position, true)
+            } else {
+                respondFailure(Errors.NotYourTurn)
+                game // ignored
+            }
+        } catch (_: PositionOutOfBoundsException) {
+            respondFailure(Errors.PositionOutOfBounds)
+            game // ignored
+        } catch (_: ForbiddenPositionException) {
+            respondFailure(Errors.ForbiddenPosition)
+            game // ignored
+        }
     }
 }
