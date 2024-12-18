@@ -5,6 +5,7 @@ import com.arnyminerz.upv.plugins.configureRouting
 import com.arnyminerz.upv.plugins.installCORS
 import com.arnyminerz.upv.plugins.installContentNegotiation
 import com.arnyminerz.upv.plugins.installSessions
+import com.arnyminerz.upv.plugins.installWebSockets
 import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.tomcat.jakarta.Tomcat
@@ -19,6 +20,8 @@ fun main() {
 fun Application.module() {
     installContentNegotiation()
     installCORS()
-    configureRouting()
     installSessions()
+    installWebSockets()
+
+    configureRouting()
 }

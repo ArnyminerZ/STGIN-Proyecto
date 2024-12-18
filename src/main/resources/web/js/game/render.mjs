@@ -2,7 +2,8 @@ import {loadingIndicator, showSnackbar} from "../ui.mjs";
 import {BoatsDragging} from "./initial_dragging.mjs";
 import {rotateBoat, updateBoatElementRotation} from "./initial_setup.mjs";
 import {equalPositions, positionHitsBoat} from "./math.mjs";
-import {opponent, opponentBombs, userBoats} from "./lookup.js";
+import {opponent, playerBoats, playerBombs} from "./lookup.js";
+import {bomb} from "./playing.mjs";
 
 /**
  * @callback ClickCellCallback
@@ -30,7 +31,7 @@ function calculateBoardSizePx(board) {
  * Creates all the div elements that compose the main playing grid, where each boat can be placed.
  * @param {HTMLDivElement} boardElement
  * @param {Game} game
- * @param {string} username
+ * @param {Player} player
  * @param {?ClickCellCallback} onClickCell
  * @param {boolean} isEnabled
  * @param {boolean} applyLeftPadding
@@ -38,7 +39,7 @@ function calculateBoardSizePx(board) {
 function renderGrid(
     boardElement,
     game,
-    username,
+    player,
     onClickCell,
     isEnabled = false,
     applyLeftPadding = false
@@ -55,9 +56,9 @@ function renderGrid(
     }
 
     /** @type {Position[]|null} */
-    const otherBombs = opponentBombs(game, username);
+    const otherBombs = playerBombs(game, player);
     /** @type {PositionedBoat[]|null} */
-    const boats = userBoats(game, username);
+    const boats = playerBoats(game, player);
 
     // Generate the grid
     for (let row = 0; row < board.rows; row++) {
@@ -88,7 +89,7 @@ function renderGrid(
             cellElement.style.top = `${row * GRID_SIZE - 1}px`;
             cellElement.style.overflow = 'visible';
 
-            cellElement.id = `cell-${row}-${column}-${username}`;
+            cellElement.id = `cell-${row}-${column}-${player}`;
             cellElement.addEventListener('drop', BoatsDragging.drop);
             cellElement.addEventListener('dragover', BoatsDragging.allowDrop);
 
@@ -152,22 +153,17 @@ function forbidDraggingBoats() {
 /**
  * Moves all the boats to their respective positions according to `game`.
  * @param {Game} game
- * @param {string} username
+ * @param {Player} player
  */
-function moveBoats(game, username) {
-    const setup = game.setupPlayer1.playerId === username ? game.setupPlayer1 :
-        game.setupPlayer1.playerId === username ? game.setupPlayer2 : null;
-    if (setup == null) {
-        console.error('Invalid setup. Could not find player', username, 'in', game.setupPlayer1.playerId, 'and', game.setupPlayer2.playerId, '.');
-        return
-    }
+function moveBoats(game, player) {
+    const setup = player === 'PLAYER1' ? game.setupPlayer1 : game.setupPlayer2;
     for (const positionedBoat of setup.positions) {
         const boatElement = document.querySelector(`[data-boat=${positionedBoat.boat.name}]`);
         if (boatElement == null) {
             console.error('Could not find boat', positionedBoat.boat.name);
             continue;
         }
-        const cellElement = document.getElementById(`cell-${positionedBoat.position.y}-${positionedBoat.position.x}-${username}`);
+        const cellElement = document.getElementById(`cell-${positionedBoat.position.y}-${positionedBoat.position.x}-${player}`);
         updateBoatElementRotation(boatElement, positionedBoat.rotation === 'VERTICAL');
         boatElement.setAttribute('data-x', `${positionedBoat.position.x}`);
         boatElement.setAttribute('data-y', `${positionedBoat.position.y}`);
@@ -188,24 +184,23 @@ function resetBoats() {
 }
 
 /**
- * @param {string} username
+ * @param {Player} player
  * @param {Match} match
- * @param {ClickCellCallback} onClickCell Called when the game has started, and the user clicks on an opponent's cell.
  */
-export async function renderGame(username, match, onClickCell) {
+export async function renderGame(player, match) {
     const game = match.game;
     const hasStarted = match.startedAt != null;
 
     const boardElement = document.getElementById('board');
     const opponentBoardElement = document.getElementById('opponentBoard');
-    const opponentUsername = opponent(game, username);
+    const opponentPlayer = opponent(player);
 
     resetBoats();
     resetCells();
 
-    renderGrid(boardElement, game, username, null, !hasStarted);
+    renderGrid(boardElement, game, player, null, !hasStarted);
     if (hasStarted) {
-        renderGrid(opponentBoardElement, game, opponentUsername, onClickCell, true, true);
+        renderGrid(opponentBoardElement, game, opponentPlayer, bomb, true, true);
         opponentBoardElement.style.display = 'block';
     } else {
         opponentBoardElement.style.display = 'none';
@@ -217,5 +212,5 @@ export async function renderGame(username, match, onClickCell) {
         forbidDraggingBoats();
     }
 
-    moveBoats(game, username);
+    moveBoats(game, player);
 }

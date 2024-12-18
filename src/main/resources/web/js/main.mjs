@@ -3,7 +3,6 @@ import {get, post} from "./requests.js";
 import {renderGame} from "./game/render.mjs";
 import {getMatch, setMatch, setUsername} from "./game/storage.js";
 import {showSnackbar} from "./ui.mjs";
-import {bomb} from "./game/playing.mjs";
 
 /**
  * Creates a new match, optionally against a specific user.
@@ -95,7 +94,66 @@ window.addEventListener('load', async () => {
      */
     async function joinMatch(match) {
         setMatch(match);
-        await renderGame(username, match, bomb);
+        await renderGame(username, match);
+
+        // Establish a connection to the socket
+        const socket = new WebSocket(`ws://${window.location.host}/api/matches/${match.id}/socket`);
+
+        socket.onopen = function(e) {
+            console.info('Connected to the socket!');
+        };
+
+        socket.onmessage = async function(event) {
+            /** @type {string} */
+            const cmd = event.data;
+            console.log('WS', 'Received message:', cmd);
+            const split = cmd.split(':');
+            // Make sure the message received is an action
+            if (split[0] !== 'ACTION') return
+            // Extract the timestamp
+            const timestamp = parseInt(split[1]);
+            // Extract the type
+            const actionType = split[2];
+            switch (actionType) {
+                case 'DropBomb':
+                    const player = split[3];
+                    const position = split[4].split(',');
+                    const x = parseInt(position[0]);
+                    const y = parseInt(position[1]);
+                    const match = getMatch();
+                    let username;
+                    if (player === 'PLAYER1') {
+                        match.game.player1Bombs.push({x, y});
+                        username = match.game.setupPlayer1.playerId;
+                    } else {
+                        match.game.player2Bombs.push({x, y});
+                        username = match.game.setupPlayer2.playerId;
+                    }
+                    setMatch(match);
+                    console.debug('User:', username, 'dropped a bomb on', x, ',', y);
+                    await renderGame(username, match);
+                    break;
+                default:
+                    console.info('Got an unknown action type:', actionType);
+                    break;
+            }
+        };
+
+        socket.onclose = function(event) {
+            if (event.wasClean) {
+                alert(`[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`);
+            } else {
+                // ej. El proceso del servidor se detuvo o la red está caída
+                // event.code es usualmente 1006 en este caso
+                alert('[close] La conexión se cayó');
+                console.warn('Lost connection with socket. Code:', event.code, 'Message:', event.data)
+            }
+        };
+
+        socket.onerror = function(error) {
+            alert(`[error]`);
+            console.error('Websocket error:', error);
+        };
     }
 
     newMatchButton.addEventListener('click', async () => {

@@ -33,7 +33,7 @@ data class Game(
      * - The player is trying to hit its own boat.
      * - The player is trying to hit a position that already has a bomb.
      */
-    fun bomb(player: Player, position: Position): Game {
+    suspend fun bomb(player: Player, position: Position): Game {
         if (turn() != player) {
             throw NotYourTurnException()
         }
@@ -46,6 +46,12 @@ data class Game(
         if (bombs.contains(position)) {
             throw ForbiddenPositionException("Already has a bomb.")
         }
+
+        Orchestrator.actionsFlow.emit(
+            GameAction(
+                GameAction.Type.DropBomb(player, position)
+            )
+        )
 
         return if (player == Player.PLAYER1) {
             copy(player1Bombs = player1Bombs + position)

@@ -53,3 +53,7 @@
  * @property {string|null} user2Id
  * @property {Game} game
  */
+
+/**
+ * @typedef {'PLAYER1','PLAYER2'} Player
+ */
