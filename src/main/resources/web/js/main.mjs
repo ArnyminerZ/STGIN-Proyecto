@@ -94,7 +94,6 @@ window.addEventListener('load', async () => {
      */
     async function joinMatch(match) {
         setMatch(match);
-        await renderGame(username, match);
 
         // Establish a connection to the socket
         const socket = new WebSocket(`ws://${window.location.host}/api/matches/${match.id}/socket`);
@@ -112,12 +111,14 @@ window.addEventListener('load', async () => {
             if (split[0] !== 'ACTION') return
             // Extract the timestamp
             const timestamp = parseInt(split[1]);
+            // Extract the match id
+            const matchId = split[2];
             // Extract the type
-            const actionType = split[2];
+            const actionType = split[3];
             switch (actionType) {
                 case 'DropBomb':
-                    const player = split[3];
-                    const position = split[4].split(',');
+                    const player = split[4];
+                    const position = split[5].split(',');
                     const x = parseInt(position[0]);
                     const y = parseInt(position[1]);
                     const match = getMatch();
@@ -131,7 +132,7 @@ window.addEventListener('load', async () => {
                     }
                     setMatch(match);
                     console.debug('User:', username, 'dropped a bomb on', x, ',', y);
-                    await renderGame(username, match);
+                    await renderGame(username, match, socket);
                     break;
                 default:
                     console.info('Got an unknown action type:', actionType);
@@ -154,6 +155,8 @@ window.addEventListener('load', async () => {
             alert(`[error]`);
             console.error('Websocket error:', error);
         };
+
+        await renderGame(username, match, socket);
     }
 
     newMatchButton.addEventListener('click', async () => {

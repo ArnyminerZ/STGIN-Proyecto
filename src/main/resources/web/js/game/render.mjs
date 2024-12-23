@@ -186,8 +186,9 @@ function resetBoats() {
 /**
  * @param {Player} player
  * @param {Match} match
+ * @param {WebSocket} socket
  */
-export async function renderGame(player, match) {
+export async function renderGame(player, match, socket) {
     const game = match.game;
     const hasStarted = match.startedAt != null;
 
@@ -200,7 +201,14 @@ export async function renderGame(player, match) {
 
     renderGrid(boardElement, game, player, null, !hasStarted);
     if (hasStarted) {
-        renderGrid(opponentBoardElement, game, opponentPlayer, bomb, true, true);
+        renderGrid(
+            opponentBoardElement,
+            game,
+            opponentPlayer,
+            (x, y) => bomb(socket, x, y),
+            true,
+            true
+        );
         opponentBoardElement.style.display = 'block';
     } else {
         opponentBoardElement.style.display = 'none';

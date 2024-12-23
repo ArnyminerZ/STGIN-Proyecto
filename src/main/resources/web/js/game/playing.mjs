@@ -1,19 +1,15 @@
-import {post} from "../requests.js";
 import {getMatch} from "./storage.js";
 
 /**
  * Drops a bomb in the given position.
+ * @param {WebSocket} socket
  * @param {number} x
  * @param {number} y
  */
-export async function bomb(x, y) {
+export async function bomb(socket, x, y) {
     const match = getMatch();
+    const now = Date.now();
 
-    const response = await post(`/api/matches/${match.id}/bomb/${x}/${y}`, {});
-    if (!response.ok) {
-        console.error(await response.json());
-    } else {
-        const hit = (await response.text()) === 'HIT';
-        console.warn("💣", x, y, hit ? '🔥' : '💧');
-    }
+    // The player number will be overridden by the server
+    socket.send(`ACTION:${now}:${match.id}:DropBomb:PLAYER1:${x},${y}`)
 }

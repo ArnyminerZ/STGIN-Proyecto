@@ -15,6 +15,8 @@ data class Position(
         }
     }
 
+    constructor(x: String, y: String): this(x.toInt(), y.toInt())
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

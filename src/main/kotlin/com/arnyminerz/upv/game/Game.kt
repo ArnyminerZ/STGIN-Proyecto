@@ -48,12 +48,7 @@ data class Game(
             throw ForbiddenPositionException("Already has a bomb.")
         }
 
-        Orchestrator.actionsFlow.emit(
-            GameAction(
-                matchId,
-                GameAction.Type.DropBomb(player, position)
-            )
-        )
+        Orchestrator.notifyAction(matchId, GameAction.Type.DropBomb(player, position))
 
         return if (player == Player.PLAYER1) {
             copy(player1Bombs = player1Bombs + position)

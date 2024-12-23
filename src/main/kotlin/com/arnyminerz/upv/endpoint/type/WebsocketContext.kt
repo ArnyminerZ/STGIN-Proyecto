@@ -6,7 +6,12 @@ import io.ktor.server.websocket.WebSocketServerSession
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
 import io.ktor.websocket.send
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 
 @ExperimentalEncodingApi
 class WebsocketContext(
@@ -24,5 +29,11 @@ class WebsocketContext(
     }
 
     suspend fun send(message: String) = session.send(message)
+
+    fun launch(
+        context: CoroutineContext = EmptyCoroutineContext,
+        start: CoroutineStart = CoroutineStart.DEFAULT,
+        block: suspend CoroutineScope.() -> Unit
+    ) = session.launch(context, start, block)
 
 }

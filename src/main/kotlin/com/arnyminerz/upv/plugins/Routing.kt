@@ -4,7 +4,6 @@ import com.arnyminerz.upv.endpoint.auth.LoginEndpoint
 import com.arnyminerz.upv.endpoint.auth.LogoutEndpoint
 import com.arnyminerz.upv.endpoint.auth.RegisterEndpoint
 import com.arnyminerz.upv.endpoint.auth.SessionEndpoint
-import com.arnyminerz.upv.endpoint.game.BombEndpoint
 import com.arnyminerz.upv.endpoint.game.GameEndpoint
 import com.arnyminerz.upv.endpoint.game.MatchEndpoint
 import com.arnyminerz.upv.endpoint.game.MatchReadyEndpoint
@@ -39,7 +38,6 @@ private val endpoints = listOf(
     StartMatchEndpoint,
     PlaceBoatMatchEndpoint,
     MatchReadyEndpoint,
-    BombEndpoint,
 )
 
 @ExperimentalUuidApi

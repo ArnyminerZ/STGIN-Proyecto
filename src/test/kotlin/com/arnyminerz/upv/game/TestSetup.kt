@@ -9,8 +9,7 @@ class TestSetup {
     @Test
     fun `test random`() {
         val board = Board(10, 10)
-        val seed = 0
-        val setup = Setup.random(board, seed)
+        val setup = Setup.random(board)
         assertTrue { setup.isReady() }
         assertFalse { setup.isEmpty() }
         assertFalse { setup.anyCollision() }
