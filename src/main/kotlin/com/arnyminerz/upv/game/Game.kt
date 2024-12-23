@@ -24,6 +24,7 @@ data class Game(
     /**
      * Throws a bomb as the given player on the specified position.
      * Makes sure that a position is not bombed twice.
+     * @param matchId The id of the match containing the game.
      * @param player The player that is throwing the bomb.
      * @param position The position to throw the bomb at.
      * @return The updated game instance.
@@ -33,7 +34,7 @@ data class Game(
      * - The player is trying to hit its own boat.
      * - The player is trying to hit a position that already has a bomb.
      */
-    suspend fun bomb(player: Player, position: Position): Game {
+    suspend fun bomb(matchId: Int, player: Player, position: Position): Game {
         if (turn() != player) {
             throw NotYourTurnException()
         }
@@ -49,6 +50,7 @@ data class Game(
 
         Orchestrator.actionsFlow.emit(
             GameAction(
+                matchId,
                 GameAction.Type.DropBomb(player, position)
             )
         )

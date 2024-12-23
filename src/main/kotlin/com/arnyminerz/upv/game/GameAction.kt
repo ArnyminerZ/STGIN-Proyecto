@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class GameAction(
+    val matchId: Int,
     val type: Type,
     val timestamp: Long = System.currentTimeMillis()
 ) {

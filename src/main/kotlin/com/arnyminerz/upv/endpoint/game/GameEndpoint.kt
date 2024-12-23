@@ -7,6 +7,7 @@ import com.arnyminerz.upv.endpoint.type.WebsocketContext
 import com.arnyminerz.upv.game.Orchestrator
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.uuid.ExperimentalUuidApi
+import kotlinx.coroutines.flow.filter
 
 @OptIn(ExperimentalEncodingApi::class, ExperimentalUuidApi::class)
 object GameEndpoint : Websocket("/api/matches/{id}/socket") {
@@ -23,7 +24,7 @@ object GameEndpoint : Websocket("/api/matches/{id}/socket") {
         }
         match!! // won't be null
 
-        Orchestrator.actionsFlow.collect { action ->
+        Orchestrator.actionsFlow.filter { it.matchId == matchId }.collect { action ->
             send(action.toString())
         }
     }

@@ -41,11 +41,11 @@ object BombEndpoint : MatchBaseEndpoint("/bomb/{x}/{y}", HttpMethod.Post) {
 
         val isVsMachine = ServerDatabase { match.user2 == null }
 
-        var game = bomb(match.game, player, position, isVsMachine)
+        var game = bomb(match.id.value, match.game, player, position, isVsMachine)
 
         // If the second player is a machine, perform a bombing
         if (isVsMachine) {
-            game = MachineActions.aiBomb(game)
+            game = MachineActions.aiBomb(match.id.value, game)
         }
 
         val hit = game.setup(player.other()).hitsAnyBoat(position)
@@ -56,17 +56,23 @@ object BombEndpoint : MatchBaseEndpoint("/bomb/{x}/{y}", HttpMethod.Post) {
         respondSuccess(if (hit) "HIT" else "MISS")
     }
 
-    private suspend fun EndpointContext.bomb(game: Game, player: Player, position: Position, isVsMachine: Boolean): Game {
+    private suspend fun EndpointContext.bomb(
+        matchId: Int,
+        game: Game,
+        player: Player,
+        position: Position,
+        isVsMachine: Boolean
+    ): Game {
         return try {
-            game.bomb(player, position)
+            game.bomb(matchId, player, position)
         } catch (_: NotYourTurnException) {
             // If not the user's turn, but vs a machine, it means that for some reason the movement of the machine
             // was not made. Make it and call the body again
             if (isVsMachine) {
                 // perform a bombing as the AI
-                val newGame = MachineActions.aiBomb(game)
+                val newGame = MachineActions.aiBomb(matchId, game)
                 // call bomb again
-                bomb(newGame, player, position, true)
+                bomb(matchId, newGame, player, position, true)
             } else {
                 respondFailure(Errors.NotYourTurn)
                 game // ignored
