@@ -16,6 +16,9 @@ object Matches: IntIdTable("Matches") {
     val startedAt = timestamp("started_at").nullable().default(null)
     val finishedAt = timestamp("finished_at").nullable().default(null)
 
+    /** Holds the number of the winner, if the game is finished. (1: user1, 2: user2) */
+    val winner = integer("winner").nullable().default(null)
+
     val game = json("game", json, Game.serializer())
 
     /**

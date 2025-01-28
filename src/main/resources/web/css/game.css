@@ -10,6 +10,19 @@
     top: 0;
 }
 
+#toolbar {
+    display: flex;
+}
+#toolbar button {
+    flex: 1;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#game {
+    display: flex;
+}
+
 .board {
     position: absolute;
     background-color: #3a93dc;

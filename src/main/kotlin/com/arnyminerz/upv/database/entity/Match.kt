@@ -18,13 +18,14 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
     var startedAt by Matches.startedAt
         private set
     var finishedAt by Matches.finishedAt
+    var winner by Matches.winner
 
     var game by Matches.game
 
     var user1 by User referencedOn Matches.user1
     var user2 by User optionalReferencedOn Matches.user2
 
-    fun isReady(): Boolean = ServerDatabase { game.isReady(user2 == null) }
+    suspend fun isReady(): Boolean = ServerDatabase { game.isReady(user2 == null) }
 
     /**
      * Starts the match by performing necessary setup and validations.
@@ -34,7 +35,7 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
      * of the second player's setup if they are not present.
      * @throws IllegalStateException If the match is not ready to start, as determined by the `isReady` method.
      */
-    fun start() = ServerDatabase {
+    suspend fun start() = ServerDatabase {
         check(isReady()) { "The game is not ready to start!" }
 
         if (user2 == null) {
@@ -45,7 +46,7 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
         startedAt = Instant.now()
     }
 
-    fun serializable(): SerializableMatch = ServerDatabase {
+    suspend fun serializable(): SerializableMatch = ServerDatabase {
         SerializableMatch(
             this@Match.id.value,
             createdAt.toEpochMilli(),
@@ -62,7 +63,7 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
      * Returns the player associated with the given [userId].
      * May return null if the given [userId] is not in the match.
      */
-    fun player(userId: String): Player? = ServerDatabase {
+    suspend fun player(userId: String): Player? = ServerDatabase {
         when (userId) {
             user1.id.value -> Player.PLAYER1
             user2?.id?.value -> Player.PLAYER2

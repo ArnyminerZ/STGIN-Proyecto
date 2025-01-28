@@ -5,8 +5,10 @@ import com.arnyminerz.upv.database.table.Users
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
+import kotlin.coroutines.CoroutineContext
 
 object ServerDatabase {
     private const val DRIVER_POSTGRES = "org.postgresql.Driver"
@@ -18,7 +20,7 @@ object ServerDatabase {
 
     private lateinit var database: Database
 
-    fun initialize() {
+    suspend fun initialize() {
         val databaseHost = System.getenv("DATABASE_HOST") ?: "localhost"
         val databasePort = System.getenv("DATABASE_PORT") ?: "5432"
         val databaseName = System.getenv("DATABASE_NAME")
@@ -52,6 +54,9 @@ object ServerDatabase {
      * @param block The code block to be executed within the transaction.
      * The block has access to the [Transaction] receiver for performing operations within the transaction.
      */
-    operator fun <Result> invoke(block: Transaction.() -> Result): Result = transaction(database, block)
+    suspend operator fun <Result> invoke(
+        context: CoroutineContext? = null,
+        block: suspend Transaction.() -> Result
+    ): Result = newSuspendedTransaction(context, database, statement = block)
 
 }

@@ -60,6 +60,7 @@ object GameEndpoint : Websocket("/api/matches/{id}/socket") {
                         val action = GameAction.fromString(receivedText)
                         when (action.type) {
                             is GameAction.Type.DropBomb -> bomb(action.matchId, action.type.copy(player = player))
+                            is GameAction.Type.GiveUp -> giveUp(action.matchId, action.type.copy(player = player))
                         }
                     } catch (e: IllegalArgumentException) {
                         logger.error("Could not parse action.", e)
@@ -146,5 +147,14 @@ object GameEndpoint : Websocket("/api/matches/{id}/socket") {
         } catch (error: ForbiddenPositionException) {
             throw error
         }
+    }
+
+    private suspend fun giveUp(matchId: Int, type: GameAction.Type.GiveUp) {
+        val match = ServerDatabase { Match.findById(matchId) }
+        if (match == null) {
+            throw ClassNotFoundException("Could not find match with id $matchId")
+        }
+
+        ServerDatabase { match.winner = if (type.player == Player.PLAYER1) 1 else 2 }
     }
 }

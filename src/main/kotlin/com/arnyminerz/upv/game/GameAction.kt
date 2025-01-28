@@ -33,6 +33,11 @@ class GameAction(
                         val player = Player.valueOf(playerName)
                         return DropBomb(player, Position(xPos, yPos))
                     }
+                    GiveUp::class.simpleName -> {
+                        val (_, playerName) = typeString.split(':')
+                        val player = Player.valueOf(playerName)
+                        return GiveUp(player)
+                    }
                     else -> error("Invalid type: $type")
                 }
             }
@@ -42,6 +47,13 @@ class GameAction(
         data class DropBomb(val player: Player, val position: Position): Type {
             override fun toString(): String {
                 return this::class.simpleName + ':' + player.name + ':' + position.x + ',' + position.y
+            }
+        }
+
+        @Serializable
+        data class GiveUp(val player: Player): Type {
+            override fun toString(): String {
+                return this::class.simpleName + ':' + player.name
             }
         }
     }

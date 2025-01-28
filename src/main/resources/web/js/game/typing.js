@@ -43,17 +43,5 @@
  */
 
 /**
- * @typedef {Object} Match
- * @property {number} id
- * @property {number} createdAt
- * @property {number|null} startedAt
- * @property {number|null} finishedAt
- * @property {boolean} ready
- * @property {string} user1Id
- * @property {string|null} user2Id
- * @property {Game} game
- */
-
-/**
  * @typedef {'PLAYER1','PLAYER2'} Player
  */

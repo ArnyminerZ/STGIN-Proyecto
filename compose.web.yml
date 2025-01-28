@@ -1,0 +1,7 @@
+services:
+  postgres:
+    image: httpd:2.4-alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./src/main/resources/web:/usr/local/apache2/htdocs/:ro

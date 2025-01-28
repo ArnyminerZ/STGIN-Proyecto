@@ -3,6 +3,7 @@ import {get, post} from "./requests.js";
 import {renderGame} from "./game/render.mjs";
 import {getMatch, setMatch, setUsername} from "./game/storage.js";
 import {showSnackbar} from "./ui.mjs";
+import {ServerResponseException} from "./exceptions.js";
 
 /**
  * Creates a new match, optionally against a specific user.
@@ -74,6 +75,8 @@ window.addEventListener('load', async () => {
     const newMatchButton = document.getElementById('newMatchButton');
     /** @type {HTMLButtonElement} */
     const startMatchButton = document.getElementById('startMatchButton');
+    /** @type {HTMLButtonElement} */
+    const stopMatchButton = document.getElementById('stopMatchButton');
     /** @type {HTMLHeadElement} */
     const pendingMatchMessage = document.getElementById('pendingMatch');
     /** @type {HTMLHeadElement} */
@@ -87,6 +90,9 @@ window.addEventListener('load', async () => {
     /** @type {HTMLDivElement} */
     const boatsElement = document.getElementById('boatsBox');
 
+    /** @type {WebSocket} */
+    let socket;
+
     /**
      * Joins the requested match by storing it into the session, and rendering the game.
      * @param {Match} match
@@ -96,13 +102,13 @@ window.addEventListener('load', async () => {
         setMatch(match);
 
         // Establish a connection to the socket
-        const socket = new WebSocket(`ws://${window.location.host}/api/matches/${match.id}/socket`);
+        socket = new WebSocket(`ws://${window.location.host}/api/matches/${match.id}/socket`);
 
-        socket.onopen = function(e) {
+        socket.onopen = function (e) {
             console.info('Connected to the socket!');
         };
 
-        socket.onmessage = async function(event) {
+        socket.onmessage = async function (event) {
             /** @type {string} */
             const cmd = event.data;
             console.log('WS', 'Received message:', cmd);
@@ -140,7 +146,7 @@ window.addEventListener('load', async () => {
             }
         };
 
-        socket.onclose = function(event) {
+        socket.onclose = function (event) {
             if (event.wasClean) {
                 alert(`[close] Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`);
             } else {
@@ -149,9 +155,10 @@ window.addEventListener('load', async () => {
                 alert('[close] La conexión se cayó');
                 console.warn('Lost connection with socket. Code:', event.code, 'Message:', event.data)
             }
+            socket = null;
         };
 
-        socket.onerror = function(error) {
+        socket.onerror = function (error) {
             alert(`[error]`);
             console.error('Websocket error:', error);
         };
@@ -165,13 +172,19 @@ window.addEventListener('load', async () => {
     });
     startMatchButton.addEventListener('click', async () => {
         showSnackbar('Iniciando partida...');
-        const response = await post(`/api/matches/${getMatch().id}/start`, {});
-        if (response.ok) {
+        try {
+            await getMatch().start();
+
             // TODO: Handle game start correctly
             window.location.reload();
-        } else {
-            response.json().then(text => showSnackbar(JSON.stringify(text)));
+        } catch (error) {
+            if (error instanceof ServerResponseException) {
+                showSnackbar(error.message)
+            }
         }
+    });
+    stopMatchButton.addEventListener('click', async () => {
+
     });
 
     console.log('Started match: ', startedMatch)
@@ -180,6 +193,7 @@ window.addEventListener('load', async () => {
         // There is a started match
         newMatchButton.setAttribute('disabled', 'true');
         startMatchButton.setAttribute('disabled', 'true');
+        stopMatchButton.removeAttribute('disabled');
 
         pendingMatchMessage.style.display = 'none';
         pendingMatchAgainstMessage.innerText = '';
@@ -200,6 +214,7 @@ window.addEventListener('load', async () => {
 
         newMatchButton.setAttribute('disabled', 'true');
         startMatchButton.removeAttribute('disabled');
+        stopMatchButton.setAttribute('disabled', 'true');
 
         pendingMatchMessage.style.display = 'block';
         pendingMatchAgainstMessage.innerText = pendingMatch.user2Id ?? 'La Máquina';
@@ -218,6 +233,7 @@ window.addEventListener('load', async () => {
         // No games started or pending
         newMatchButton.removeAttribute('disabled');
         startMatchButton.setAttribute('disabled', 'true');
+        stopMatchButton.setAttribute('disabled', 'true');
 
         pendingMatchMessage.style.display = 'none';
         startedMatchMessage.style.display = 'none';

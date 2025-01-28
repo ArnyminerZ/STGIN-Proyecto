@@ -1,3 +1,5 @@
+import {Match} from '../data/match.mjs';
+
 /**
  * Fetches the stored match.
  * @returns {Match|null}
@@ -5,7 +7,7 @@
 export function getMatch() {
     const json = sessionStorage.getItem("match");
     if (json != null) {
-        return JSON.parse(json);
+        return Match.fromJSON(json);
     } else {
         return null;
     }
