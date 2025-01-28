@@ -81,4 +81,15 @@ data class Setup(
         positions.add(boat)
         return copy(positions = positions)
     }
+
+    /**
+     * Returns all the positioned boats that have been destroyed, this is, that all of their used positions have been
+     * hit by one of [bombs].
+     */
+    fun destroyedBoats(bombs: Set<Position>): List<PositionedBoat> {
+        return positions.filter { positionedBoat ->
+            val cells = positionedBoat.occupiedCells()
+            cells.all { bombs.contains(it) }
+        }
+    }
 }

@@ -10,7 +10,9 @@ data class Game(
     val board: Board,
     val setupPlayer1: Setup,
     val setupPlayer2: Setup,
+    /** The bombs dropped by player 1 */
     private val player1Bombs: Set<Position> = emptySet(),
+    /** The bombs dropped by player 2 */
     private val player2Bombs: Set<Position> = emptySet(),
 ) {
     fun isReady(vsMachine: Boolean): Boolean = setupPlayer1.isReady() && (vsMachine || setupPlayer2.isReady())
@@ -54,6 +56,23 @@ data class Game(
             copy(player1Bombs = player1Bombs + position)
         } else {
             copy(player2Bombs = player2Bombs + position)
+        }
+    }
+
+    /**
+     * Checks whether the game is over (aka someone has lost).
+     *
+     * @return `null` if the game is not over, otherwise the player that won.
+     */
+    fun isOver(): Player? {
+        val player1DestroyedBoats = setupPlayer1.destroyedBoats(player2Bombs)
+        val player2DestroyedBoats = setupPlayer2.destroyedBoats(player1Bombs)
+        return if (player1DestroyedBoats.size >= Boat.all.size) {
+            Player.PLAYER2
+        } else if (player2DestroyedBoats.size >= Boat.all.size) {
+            Player.PLAYER1
+        } else {
+            null
         }
     }
 }

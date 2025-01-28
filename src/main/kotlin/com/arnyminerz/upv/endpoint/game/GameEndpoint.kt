@@ -8,11 +8,7 @@ import com.arnyminerz.upv.endpoint.type.WebsocketContext
 import com.arnyminerz.upv.exception.ForbiddenPositionException
 import com.arnyminerz.upv.exception.NotYourTurnException
 import com.arnyminerz.upv.exception.PositionOutOfBoundsException
-import com.arnyminerz.upv.game.Game
-import com.arnyminerz.upv.game.GameAction
-import com.arnyminerz.upv.game.Orchestrator
-import com.arnyminerz.upv.game.Player
-import com.arnyminerz.upv.game.Position
+import com.arnyminerz.upv.game.*
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -45,8 +41,13 @@ object GameEndpoint : Websocket("/api/matches/{id}/socket") {
         }
         player!! // Not null
 
-        val job = launch {
+        val actionsObserver = launch {
             Orchestrator.actionsFlow.filter { it.matchId == matchId }.collect { action ->
+                send(action.toString())
+            }
+        }
+        val stateObserver = launch {
+            Orchestrator.stateFlow.filter { it.matchId == matchId }.collect { action ->
                 send(action.toString())
             }
         }
@@ -77,7 +78,10 @@ object GameEndpoint : Websocket("/api/matches/{id}/socket") {
             }
         }
             .onFailure { exception -> logger.error("Got an exception on the game endpoint.", exception) }
-            .also { job.cancel() }
+            .also {
+                actionsObserver.cancel()
+                stateObserver.cancel()
+            }
     }
 
     private suspend fun bomb(matchId: Int, type: GameAction.Type.DropBomb): Boolean {
@@ -103,7 +107,16 @@ object GameEndpoint : Websocket("/api/matches/{id}/socket") {
         // Update the game in the database
         ServerDatabase { match.game = game }
 
+        // Notify the action made
         Orchestrator.notifyAction(matchId, type)
+
+        val winner = game.isOver()
+        val state = if (winner == null) {
+            GameState.State.Playing
+        } else {
+            GameState.State.Ended(winner)
+        }
+        Orchestrator.notifyState(matchId, state)
 
         return hit
     }
