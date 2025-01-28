@@ -20,13 +20,13 @@ repositories {
 
 dependencies {
     // Ktor
-    implementation(libs.ktor.contentNegotiation)
-    implementation(libs.ktor.core)
-    implementation(libs.ktor.cors)
+    implementation(libs.ktor.server.contentNegotiation)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.cors)
+    implementation(libs.ktor.server.sessions)
+    implementation(libs.ktor.server.tomcat)
+    implementation(libs.ktor.server.websockets)
     implementation(libs.ktor.serialization.json)
-    implementation(libs.ktor.sessions)
-    implementation(libs.ktor.tomcat)
-    implementation(libs.ktor.websockets)
 
     // Exposed
     implementation(libs.exposed.core)
