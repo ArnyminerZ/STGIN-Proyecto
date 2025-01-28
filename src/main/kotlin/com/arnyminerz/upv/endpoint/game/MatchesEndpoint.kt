@@ -14,7 +14,7 @@ import org.jetbrains.exposed.sql.or
 /**
  * Returns a list of all the matches being currently played by the logged-in user.
  */
-object MatchesEndpoint: SecureEndpoint("/api/matches", HttpMethod.Get) {
+object MatchesEndpoint : SecureEndpoint("/api/matches", HttpMethod.Get) {
     override suspend fun EndpointContext.secureBody(userId: String) {
         val matches = ServerDatabase {
             Match.find { (Matches.user1 eq userId) or (Matches.user2 eq userId) }.toList()

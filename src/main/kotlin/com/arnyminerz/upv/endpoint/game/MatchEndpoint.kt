@@ -8,7 +8,7 @@ import io.ktor.http.HttpMethod
 /**
  * Returns a list of all the matches being currently played by the logged-in user.
  */
-object MatchEndpoint: MatchBaseEndpoint("", HttpMethod.Get) {
+object MatchEndpoint : MatchBaseEndpoint("", HttpMethod.Get) {
     override suspend fun EndpointContext.matchBody(userId: String, match: Match) {
         respondSuccess(
             match.serializable(),

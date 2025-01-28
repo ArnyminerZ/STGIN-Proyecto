@@ -16,7 +16,7 @@ import io.ktor.http.HttpMethod
 abstract class MatchBaseEndpoint(
     operation: String,
     httpMethod: HttpMethod = HttpMethod.Post
-): SecureEndpoint("/api/matches/{id}$operation", httpMethod) {
+) : SecureEndpoint("/api/matches/{id}$operation", httpMethod) {
     final override suspend fun EndpointContext.secureBody(userId: String) {
         val matchId = call.parameters["id"]?.toIntOrNull()
         if (matchId == null) {

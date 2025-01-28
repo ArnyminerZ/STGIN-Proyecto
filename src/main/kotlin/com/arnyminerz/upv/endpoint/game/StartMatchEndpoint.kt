@@ -8,7 +8,7 @@ import io.ktor.http.HttpMethod
 /**
  * Requests the server to start the match.
  */
-object StartMatchEndpoint: MatchBaseEndpoint("/start", HttpMethod.Post) {
+object StartMatchEndpoint : MatchBaseEndpoint("/start", HttpMethod.Post) {
     override suspend fun EndpointContext.matchBody(userId: String, match: Match) {
         if (!match.isReady()) {
             respondFailure(Errors.MatchNotReady)

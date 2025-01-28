@@ -44,8 +44,8 @@ object NewMatchEndpoint : SecureEndpoint("/api/matches", HttpMethod.Post) {
         val anyUnfinishedMatch = ServerDatabase {
             Match.find {
                 (Matches.user1 eq userId) and (Matches.user2 eq user2Id) and
-                    // The game has not been finished
-                    (Matches.finishedAt.isNull())
+                        // The game has not been finished
+                        (Matches.finishedAt.isNull())
             }.limit(1).count() > 0
         }
         if (anyUnfinishedMatch) {
