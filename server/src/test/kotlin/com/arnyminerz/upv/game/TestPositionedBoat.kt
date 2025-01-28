@@ -3,7 +3,7 @@ package com.arnyminerz.upv.game
 import kotlin.test.assertContentEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.junit.Test
+import kotlin.test.Test
 
 class TestPositionedBoat {
     @Test

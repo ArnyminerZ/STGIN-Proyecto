@@ -2,7 +2,7 @@ package com.arnyminerz.upv.game
 
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
-import org.junit.Test
+import kotlin.test.Test
 
 class TestPosition {
     @Test
