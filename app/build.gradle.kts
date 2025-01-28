@@ -21,7 +21,7 @@ val configDir = layout.buildDirectory.dir("config").get().apply {
 kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "composeApp"
+        moduleName = "app"
         browser {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
@@ -65,6 +65,8 @@ kotlin {
                 // Kotlinx Coroutines & Serialization
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization)
+
+                implementation(libs.napier)
 
                 // Ktor Client
                 implementation(libs.ktor.client.auth)

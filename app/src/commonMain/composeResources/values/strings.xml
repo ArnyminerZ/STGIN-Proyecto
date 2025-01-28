@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="reload">Reload</string>
+
+    <string name="error_cors_text">Client is not authorized on Server: CORS request blocked.</string>
+    <string name="error_cors_server">Server URL: %1$s</string>
+</resources>

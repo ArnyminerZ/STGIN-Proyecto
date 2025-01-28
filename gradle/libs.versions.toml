@@ -10,6 +10,7 @@ kotlinx-serialization = "1.7.3"
 kreds = "0.9.1"
 ktor = "3.0.2"
 logback = "1.4.14"
+napier = "2.7.1"
 postgresql = "42.7.2"
 
 [libraries]
@@ -38,6 +39,7 @@ ktor-server-sessions = { module = "io.ktor:ktor-server-sessions", version.ref = 
 ktor-server-tomcat = { module = "io.ktor:ktor-server-tomcat-jakarta-jvm", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 
 [plugins]

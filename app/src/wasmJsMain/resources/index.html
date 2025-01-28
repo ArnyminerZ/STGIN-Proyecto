@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto STGIN</title>
+    <link type="text/css" rel="stylesheet" href="styles.css">
+    <link type="text/css" rel="stylesheet" href="autofill.css">
+    <script>
+        // Workaround for including credentials
+        window.originalFetch = window.fetch;
+        window.fetch = function (resource, init) {
+            return window.originalFetch(resource, Object.assign({credentials: 'include'}, init || {}));
+        };
+    </script>
+    <script type="application/javascript" src="config.js"></script>
+    <script>
+        // Checks whether requests are authorized by CORS
+        /** @type {Promise<string>} */
+        let corsForbidden = new Promise((resolve) => {
+            fetch(SERVER_URL, {
+                method: 'OPTIONS',
+                headers: {'Access-Control-Request-Headers': 'content-type', 'Access-Control-Request-Method': 'Get'}
+            }).then(() => {
+                resolve(false);
+            }).catch((e) => {
+                const corsForbidden = e.toString().includes('NetworkError');
+                if (corsForbidden) {
+                    // The request has failed, sometimes this is because CORS is allowing all hosts, so try a basic GET
+                    fetch(SERVER_URL).then(() => {
+                        resolve(false);
+                    }).catch((error) => {
+                        // If the request still fails, CORS is definitely blocked
+                        const corsForbidden = error.toString().includes('NetworkError');
+                        if (corsForbidden) {
+                            console.error('CORS is blocking requests.');
+                            console.error('Error:', error);
+                            resolve(true);
+                        } else {
+                            resolve(false);
+                        }
+                    });
+                } else {
+                    resolve(false);
+                }
+            })
+        });
+    </script>
+    <script type="application/javascript" src="webApp.js"></script>
+</head>
+<body>
+</body>
+</html>
