@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import compatibility.corsForbidden
 import io.github.aakira.napier.Napier
@@ -45,7 +46,12 @@ fun App() {
         navController = navController,
         startDestination = startDestination
     ) {
-
+        composable<Destinations.Main> {
+            Text("Main")
+        }
+        composable<Destinations.NotFound> {
+            Text("Could not find: ${window.location.pathname}")
+        }
     }
 }
 

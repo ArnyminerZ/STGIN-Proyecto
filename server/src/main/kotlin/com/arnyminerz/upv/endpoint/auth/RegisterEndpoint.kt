@@ -13,7 +13,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 /**
  * Registers a new user in the database.
  */
-object RegisterEndpoint : Endpoint("/api/auth/register", HttpMethod.Post) {
+object RegisterEndpoint : Endpoint(Endpoints.Auth.REGISTER, HttpMethod.Post) {
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun EndpointContext.body() {
         val (username, password) = fetchCredentials()

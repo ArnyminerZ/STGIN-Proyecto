@@ -46,6 +46,9 @@ kotlin {
             resources.srcDir(configDir.asFile)
 
             dependencies {
+                // Shared code
+                implementation(project(":shared"))
+
                 // Base Compose Dependencies
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)

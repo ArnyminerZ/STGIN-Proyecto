@@ -19,6 +19,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":shared"))
+
     // Ktor
     implementation(libs.ktor.server.contentNegotiation)
     implementation(libs.ktor.server.core)

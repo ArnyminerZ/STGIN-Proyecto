@@ -31,5 +31,6 @@ dependencyResolutionManagement {
     }
 }
 
+include("shared")
 include("server")
 include("app")

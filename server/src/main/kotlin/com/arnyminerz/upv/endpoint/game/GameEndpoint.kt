@@ -1,5 +1,6 @@
 package com.arnyminerz.upv.endpoint.game
 
+import Endpoints
 import com.arnyminerz.upv.ai.MachineActions
 import com.arnyminerz.upv.database.ServerDatabase
 import com.arnyminerz.upv.database.entity.Match
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.filter
 import org.slf4j.LoggerFactory
 
 @OptIn(ExperimentalEncodingApi::class, ExperimentalUuidApi::class)
-object GameEndpoint : Websocket("/api/matches/{id}/socket") {
+object GameEndpoint : Websocket(Endpoints.Game.GAME) {
 
     private val logger = LoggerFactory.getLogger(GameEndpoint::class.java)
 

@@ -9,14 +9,11 @@ import io.ktor.http.HttpMethod
 
 /**
  * Serves as a template for endpoints that handle specific matches.
- * @param operation The operation being applied to the match, can be empty (for fetching a path without applying an
- * operation), or contain a sub-path.
- * The resulting route of the endpoint will be: `/api/matches/{id}{operation}`, so `operation` must start with a `/`.
  */
 abstract class MatchBaseEndpoint(
-    operation: String,
+    route: String,
     httpMethod: HttpMethod = HttpMethod.Post
-) : SecureEndpoint("/api/matches/{id}$operation", httpMethod) {
+) : SecureEndpoint(route, httpMethod) {
     final override suspend fun EndpointContext.secureBody(userId: String) {
         val matchId = call.parameters["id"]?.toIntOrNull()
         if (matchId == null) {

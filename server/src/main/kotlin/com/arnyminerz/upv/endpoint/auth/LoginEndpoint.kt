@@ -1,5 +1,6 @@
 package com.arnyminerz.upv.endpoint.auth
 
+import Endpoints
 import com.arnyminerz.upv.cache.CacheRepository
 import com.arnyminerz.upv.cache.UserSession
 import com.arnyminerz.upv.database.ServerDatabase
@@ -22,7 +23,7 @@ import com.arnyminerz.upv.plugins.UserSession as UserSessionData
  * Used for authenticating as a user.
  * Sessions are handled by ktor using cookies.
  */
-object LoginEndpoint : Endpoint("/api/auth/login", HttpMethod.Post) {
+object LoginEndpoint : Endpoint(Endpoints.Auth.LOGIN, HttpMethod.Post) {
     @OptIn(ExperimentalEncodingApi::class, ExperimentalUuidApi::class)
     override suspend fun EndpointContext.body() {
         val (username, password) = fetchCredentials()

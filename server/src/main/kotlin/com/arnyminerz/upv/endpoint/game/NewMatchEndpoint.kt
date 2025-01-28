@@ -1,5 +1,6 @@
 package com.arnyminerz.upv.endpoint.game
 
+import Endpoints
 import com.arnyminerz.upv.database.ServerDatabase
 import com.arnyminerz.upv.database.entity.Match
 import com.arnyminerz.upv.database.entity.User
@@ -18,7 +19,7 @@ import org.jetbrains.exposed.sql.and
 /**
  * Returns a list of all the matches being currently played by the logged-in user.
  */
-object NewMatchEndpoint : SecureEndpoint("/api/matches", HttpMethod.Post) {
+object NewMatchEndpoint : SecureEndpoint(Endpoints.Game.MATCHES, HttpMethod.Post) {
     override suspend fun EndpointContext.secureBody(userId: String) {
         val parameters = call.parameters
         val seed = parameters["seed"]?.toIntOrNull() ?: 0

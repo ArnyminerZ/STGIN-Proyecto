@@ -25,5 +25,8 @@ fun Application.installCORS() {
             anyHost()
             anyMethod()
         }
+
+        allowCredentials = true
+        allowSameOrigin = true
     }
 }

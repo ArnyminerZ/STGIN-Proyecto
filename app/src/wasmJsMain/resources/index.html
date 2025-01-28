@@ -19,27 +19,18 @@
         /** @type {Promise<string>} */
         let corsForbidden = new Promise((resolve) => {
             fetch(SERVER_URL, {
-                method: 'OPTIONS',
+                method: 'GET',
+                mode: 'cors',
                 headers: {'Access-Control-Request-Headers': 'content-type', 'Access-Control-Request-Method': 'Get'}
             }).then(() => {
                 resolve(false);
-            }).catch((e) => {
-                const corsForbidden = e.toString().includes('NetworkError');
+            }).catch((error) => {
+                // If the request still fails, CORS is definitely blocked
+                const corsForbidden = error.toString().includes('NetworkError');
                 if (corsForbidden) {
-                    // The request has failed, sometimes this is because CORS is allowing all hosts, so try a basic GET
-                    fetch(SERVER_URL).then(() => {
-                        resolve(false);
-                    }).catch((error) => {
-                        // If the request still fails, CORS is definitely blocked
-                        const corsForbidden = error.toString().includes('NetworkError');
-                        if (corsForbidden) {
-                            console.error('CORS is blocking requests.');
-                            console.error('Error:', error);
-                            resolve(true);
-                        } else {
-                            resolve(false);
-                        }
-                    });
+                    console.error('CORS is blocking requests.');
+                    console.error('Error:', error);
+                    resolve(true);
                 } else {
                     resolve(false);
                 }

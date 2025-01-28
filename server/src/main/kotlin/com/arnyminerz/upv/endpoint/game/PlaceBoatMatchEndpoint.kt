@@ -1,5 +1,6 @@
 package com.arnyminerz.upv.endpoint.game
 
+import Endpoints
 import com.arnyminerz.upv.database.ServerDatabase
 import com.arnyminerz.upv.database.entity.Match
 import com.arnyminerz.upv.database.entity.User
@@ -15,7 +16,7 @@ import io.ktor.server.request.receiveText
 /**
  * Requests the server to start the match.
  */
-object PlaceBoatMatchEndpoint : MatchBaseEndpoint("/place", HttpMethod.Post) {
+object PlaceBoatMatchEndpoint : MatchBaseEndpoint(Endpoints.Game.MATCH_PLACE, HttpMethod.Post) {
     override suspend fun EndpointContext.matchBody(userId: String, match: Match) {
         if (match.startedAt != null) {
             respondFailure(Errors.MatchAlreadyStarted)

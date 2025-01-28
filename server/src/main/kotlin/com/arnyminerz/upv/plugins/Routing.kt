@@ -1,5 +1,6 @@
 package com.arnyminerz.upv.plugins
 
+import com.arnyminerz.upv.endpoint.RootEndpoint
 import com.arnyminerz.upv.endpoint.auth.LoginEndpoint
 import com.arnyminerz.upv.endpoint.auth.LogoutEndpoint
 import com.arnyminerz.upv.endpoint.auth.RegisterEndpoint
@@ -25,6 +26,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.uuid.ExperimentalUuidApi
 
 private val endpoints = listOf(
+    RootEndpoint,
+
     // Authentication
     RegisterEndpoint,
     LoginEndpoint,
