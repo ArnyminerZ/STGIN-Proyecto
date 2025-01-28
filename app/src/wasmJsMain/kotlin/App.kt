@@ -21,7 +21,9 @@ import compatibility.corsForbidden
 import io.github.aakira.napier.Napier
 import kotlinx.browser.window
 import navigation.Destinations
+import navigation.navigateToDestination
 import org.jetbrains.compose.resources.stringResource
+import screen.AuthScreen
 import stgin_proyecto_final.app.generated.resources.*
 
 @Composable
@@ -48,6 +50,13 @@ fun App() {
     ) {
         composable<Destinations.Main> {
             Text("Main")
+        }
+        composable<Destinations.Auth> {
+            AuthScreen(
+                onAlreadyLoggedIn = {
+                    // navigateToDestination(Destinations.Main)
+                }
+            )
         }
         composable<Destinations.NotFound> {
             Text("Could not find: ${window.location.pathname}")

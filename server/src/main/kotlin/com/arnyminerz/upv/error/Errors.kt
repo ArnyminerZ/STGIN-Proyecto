@@ -1,57 +1,58 @@
 package com.arnyminerz.upv.error
 
+import error.ErrorCodes
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.Serializable
 
 object Errors {
     @Serializable
-    data object MissingCredentials : Error(1, "Missing credentials.", HttpStatusCode.Unauthorized)
+    data object MissingCredentials : Error(ErrorCodes.MISSING_CREDENTIALS, "Missing credentials.", HttpStatusCode.Unauthorized)
 
     @Serializable
-    data object InvalidCredentials : Error(2, "Invalid credentials.")
+    data object InvalidCredentials : Error(ErrorCodes.INVALID_CREDENTIALS, "Invalid credentials.")
 
     @Serializable
-    data object UserAlreadyExists : Error(3, "User already exists.")
+    data object UserAlreadyExists : Error(ErrorCodes.USER_ALREADY_EXISTS, "User already exists.")
 
     @Serializable
-    data object NotLoggedIn : Error(4, "Not logged in.", HttpStatusCode.Forbidden)
+    data object NotLoggedIn : Error(ErrorCodes.NOT_LOGGED_IN, "Not logged in.", HttpStatusCode.Forbidden)
 
     @Serializable
-    data object MatchNotFound : Error(5, "Match not found.")
+    data object MatchNotFound : Error(ErrorCodes.MATCH_NOT_FOUND, "Match not found.")
 
     @Serializable
-    data object CannotMatchAgainstYourself : Error(6, "You cannot match against yourself.")
+    data object CannotMatchAgainstYourself : Error(ErrorCodes.CANNOT_MATCH_AGAINST_YOURSELF, "You cannot match against yourself.")
 
     @Serializable
-    data object UserNotFound : Error(7, "User not found.")
+    data object UserNotFound : Error(ErrorCodes.USER_NOT_FOUND, "User not found.")
 
     @Serializable
-    data object MatchPending : Error(8, "Match pending.")
+    data object MatchPending : Error(ErrorCodes.MATCH_PENDING, "Match pending.")
 
     @Serializable
-    data object MatchNotReady : Error(9, "Match not ready.")
+    data object MatchNotReady : Error(ErrorCodes.MATCH_NOT_READY, "Match not ready.")
 
     @Serializable
-    data object MatchAlreadyStarted : Error(10, "Match already started.")
+    data object MatchAlreadyStarted : Error(ErrorCodes.MATCH_ALREADY_STARTED, "Match already started.")
 
     @Serializable
-    data object PositionOutOfBounds : Error(11, "Position out of bounds.")
+    data object PositionOutOfBounds : Error(ErrorCodes.POSITION_OUT_OF_BOUNDS, "Position out of bounds.")
 
     @Serializable
-    data object ForbiddenPosition : Error(12, "Forbidden position.")
+    data object ForbiddenPosition : Error(ErrorCodes.FORBIDDEN_POSITION, "Forbidden position.")
 
     @Serializable
-    data object NotYourMatch : Error(13, "You are not in this match.", HttpStatusCode.Forbidden)
+    data object NotYourMatch : Error(ErrorCodes.NOT_YOUR_MATCH, "You are not in this match.", HttpStatusCode.Forbidden)
 
     @Serializable
-    data object MatchNotStarted : Error(14, "Match not started.")
+    data object MatchNotStarted : Error(ErrorCodes.MATCH_NOT_STARTED, "Match not started.")
 
     @Serializable
-    data object MatchAlreadyFinished : Error(15, "Match already finished.")
+    data object MatchAlreadyFinished : Error(ErrorCodes.MATCH_ALREADY_FINISHED, "Match already finished.")
 
     @Serializable
-    data object InvalidPosition : Error(16, "Invalid position.")
+    data object InvalidPosition : Error(ErrorCodes.INVALID_POSITION, "Invalid position.")
 
     @Serializable
-    data object NotYourTurn : Error(17, "It's not your turn.", HttpStatusCode.Conflict)
+    data object NotYourTurn : Error(ErrorCodes.NOT_YOUR_TURN, "It's not your turn.", HttpStatusCode.Conflict)
 }
