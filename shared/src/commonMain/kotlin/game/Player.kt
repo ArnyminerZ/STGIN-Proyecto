@@ -1,4 +1,4 @@
-package com.arnyminerz.upv.game
+package game
 
 enum class Player {
     PLAYER1,

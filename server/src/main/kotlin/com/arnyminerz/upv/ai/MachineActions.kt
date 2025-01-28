@@ -2,8 +2,8 @@ package com.arnyminerz.upv.ai
 
 import com.arnyminerz.upv.exception.ForbiddenPositionException
 import com.arnyminerz.upv.game.Game
-import com.arnyminerz.upv.game.Player
-import com.arnyminerz.upv.game.Position
+import game.Player
+import game.Position
 
 object MachineActions {
     suspend fun aiBomb(matchId: Int, game: Game): Game = randomBomb(matchId, game)

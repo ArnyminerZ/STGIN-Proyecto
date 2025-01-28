@@ -1,5 +1,10 @@
 package com.arnyminerz.upv.game
 
+import game.Board
+import game.Boat
+import game.Position
+import game.PositionedBoat
+import game.Rotation
 import kotlin.random.Random
 import kotlinx.serialization.Serializable
 

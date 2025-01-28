@@ -5,10 +5,11 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
 }
 
+@OptIn(ExperimentalWasmDsl::class)
 kotlin {
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs()
-
+    wasmJs {
+        browser()
+    }
     jvm()
 
     sourceSets {

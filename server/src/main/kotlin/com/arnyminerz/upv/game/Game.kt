@@ -3,6 +3,10 @@ package com.arnyminerz.upv.game
 import com.arnyminerz.upv.exception.ForbiddenPositionException
 import com.arnyminerz.upv.exception.NotYourTurnException
 import com.arnyminerz.upv.exception.PositionOutOfBoundsException
+import game.Board
+import game.Boat
+import game.Player
+import game.Position
 import kotlinx.serialization.Serializable
 
 @Serializable

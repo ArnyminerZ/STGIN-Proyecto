@@ -10,6 +10,8 @@ import com.arnyminerz.upv.exception.ForbiddenPositionException
 import com.arnyminerz.upv.exception.NotYourTurnException
 import com.arnyminerz.upv.exception.PositionOutOfBoundsException
 import com.arnyminerz.upv.game.*
+import game.Player
+import game.Position
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlin.io.encoding.ExperimentalEncodingApi

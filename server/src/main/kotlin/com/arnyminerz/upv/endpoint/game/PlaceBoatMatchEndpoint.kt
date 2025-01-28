@@ -6,9 +6,10 @@ import com.arnyminerz.upv.database.entity.Match
 import com.arnyminerz.upv.database.entity.User
 import com.arnyminerz.upv.endpoint.type.EndpointContext
 import com.arnyminerz.upv.error.Errors
-import com.arnyminerz.upv.game.Player
+import com.arnyminerz.upv.game.fits
 import com.arnyminerz.upv.plugins.json
 import com.arnyminerz.upv.request.PlaceBoatRequest
+import game.Player
 import io.ktor.http.HttpMethod
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveText

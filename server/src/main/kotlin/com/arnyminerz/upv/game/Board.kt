@@ -1,12 +1,6 @@
 package com.arnyminerz.upv.game
 
-import kotlinx.serialization.Serializable
+import game.Board
+import game.Position
 
-@Serializable
-class Board(
-    val seed: Int = 0,
-    val rows: Int = 10,
-    val columns: Int = 10
-) {
-    fun inBounds(position: Position) = position.x < columns && position.y < rows
-}
+fun Board.inBounds(position: Position) = position.x < columns && position.y < rows

@@ -1,6 +1,6 @@
 package com.arnyminerz.upv.request
 
-import com.arnyminerz.upv.game.PositionedBoat
+import game.PositionedBoat
 import kotlinx.serialization.Serializable
 
 @Serializable

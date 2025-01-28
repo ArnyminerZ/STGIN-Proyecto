@@ -2,9 +2,9 @@ package com.arnyminerz.upv.database.entity
 
 import com.arnyminerz.upv.database.ServerDatabase
 import com.arnyminerz.upv.database.table.Matches
-import com.arnyminerz.upv.game.Player
 import com.arnyminerz.upv.game.Setup
 import com.arnyminerz.upv.response.SerializableMatch
+import game.Player
 import java.time.Instant
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass

@@ -1,5 +1,6 @@
 package com.arnyminerz.upv.game
 
+import game.Player
 import kotlinx.serialization.Serializable
 
 @Serializable

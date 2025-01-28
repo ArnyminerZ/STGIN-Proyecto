@@ -8,10 +8,10 @@ import com.arnyminerz.upv.database.table.Matches
 import com.arnyminerz.upv.endpoint.type.EndpointContext
 import com.arnyminerz.upv.endpoint.type.SecureEndpoint
 import com.arnyminerz.upv.error.Errors
-import com.arnyminerz.upv.game.Board
 import com.arnyminerz.upv.game.Game
 import com.arnyminerz.upv.game.Setup
 import com.arnyminerz.upv.request.NewMatchRequest
+import game.Board
 import io.ktor.http.HttpMethod
 import io.ktor.server.request.receive
 import org.jetbrains.exposed.sql.and
