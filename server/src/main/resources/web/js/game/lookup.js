@@ -14,7 +14,7 @@ export function opponent(player) {
  * @returns {Position[]|null}
  */
 export function playerBombs(game, player) {
-    return player === 'PLAYER1' ? game.player1Bombs : game.player2Bombs;
+    return player === 'PLAYER1' ? game.player2Bombs : game.player1Bombs;
 }
 
 /**

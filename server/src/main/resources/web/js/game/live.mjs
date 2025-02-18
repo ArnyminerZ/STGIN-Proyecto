@@ -83,7 +83,7 @@ export async function handleStateMessage(cmd, socket) {
         case 'READY': {
             showSnackbar('Cargando partida...')
 
-            const match = getMatch();
+            const match = await refreshMatch();
             await renderGame(match, socket);
 
             break;

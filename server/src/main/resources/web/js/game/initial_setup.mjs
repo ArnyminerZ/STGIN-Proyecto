@@ -68,6 +68,7 @@ export async function rotateBoat(boatId) {
     const y = parseInt(boat.getAttribute('data-y'));
 
     if (!await requestBoatPlacing(boatId, x, y)) {
+        console.error('Invalid rotation');
         updateBoatElementRotation(boat, rotated);
         return false;
     }
