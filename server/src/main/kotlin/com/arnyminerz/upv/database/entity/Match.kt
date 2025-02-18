@@ -2,6 +2,7 @@ package com.arnyminerz.upv.database.entity
 
 import com.arnyminerz.upv.database.ServerDatabase
 import com.arnyminerz.upv.database.table.Matches
+import com.arnyminerz.upv.game.Game
 import com.arnyminerz.upv.game.GameState
 import com.arnyminerz.upv.game.Orchestrator
 import com.arnyminerz.upv.game.Setup
@@ -13,22 +14,44 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 
 class Match(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Match>(Matches)
+    companion object : IntEntityClass<Match>(Matches) {
+        suspend fun create(game: Game, user1: User, user2: User?) = ServerDatabase {
+            new {
+                this.game = game
+
+                this.user1 = user1
+                this.user1Accepted = true // user1 always accepts by default
+
+                this.user2 = user2
+                this.user2Accepted = user2 == null // Automatically accept for machine
+            }
+        }
+    }
 
     val createdAt by Matches.createdAt
 
     var startedAt by Matches.startedAt
         private set
     var finishedAt by Matches.finishedAt
+        private set
     var winner by Matches.winner
+        private set
 
     var game by Matches.game
 
     var user1 by User referencedOn Matches.user1
-    var user2 by User optionalReferencedOn Matches.user2
-
+        private set
+    var user1Accepted by Matches.user1Accepted
+        private set
     var user1Ready by Matches.user1Ready
+        private set
+
+    var user2 by User optionalReferencedOn Matches.user2
+        private set
+    var user2Accepted by Matches.user2Accepted
+        private set
     var user2Ready by Matches.user2Ready
+        private set
 
     suspend fun isReady(): Boolean = ServerDatabase { game.isReady(user2 == null) }
 
@@ -45,6 +68,20 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
         }
 
         notifyState(GameState.State.Preparation(user1Ready, user2Ready))
+    }
+
+    suspend fun accept(userId: String) {
+        val player = player(userId) ?: error("Could not accept as the machine")
+
+        ServerDatabase {
+            if (player == Player.PLAYER1) {
+                user1Accepted = true
+            } else {
+                user2Accepted = true
+            }
+        }
+
+        notifyState(GameState.State.Preparation(user1Ready = false, user2Ready = false))
     }
 
     /**
@@ -68,6 +105,15 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
         notifyState(GameState.State.Ready)
     }
 
+    suspend fun finish(winner: Player) {
+        ServerDatabase {
+            this@Match.winner = if (winner == Player.PLAYER1) 1 else 2
+            this@Match.finishedAt = Instant.now()
+        }
+
+        notifyState(GameState.State.Ended(winner))
+    }
+
     suspend fun serializable(): SerializableMatch = ServerDatabase {
         SerializableMatch(
             this@Match.id.value,
@@ -77,7 +123,11 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
             finishedAt?.toEpochMilli(),
             game,
             user1.id.value,
+            user1Accepted,
+            user1Ready,
             user2?.id?.value,
+            user2Accepted,
+            user2Ready,
         )
     }
 

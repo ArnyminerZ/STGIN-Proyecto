@@ -17,5 +17,6 @@ object Endpoints {
         const val MATCH_READY = "/matches/{id}/is_ready"
         const val MATCH_PLACE = "/matches/{id}/place"
         const val MATCH_START = "/matches/{id}/start"
+        const val MATCH_ACCEPT = "/matches/{id}/accept"
     }
 }

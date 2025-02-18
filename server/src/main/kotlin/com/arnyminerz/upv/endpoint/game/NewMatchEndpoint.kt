@@ -70,13 +70,8 @@ object NewMatchEndpoint : SecureEndpoint(Endpoints.Game.MATCHES, HttpMethod.Post
         )
 
         // Create the match
-        ServerDatabase {
-            Match.new {
-                this.game = game
-                this.user1 = User.findById(userId)!!
-                this.user2 = user2
-            }
-        }
+        val user1 = ServerDatabase { User.findById(userId)!! }
+        Match.create(game, user1, user2)
 
         respondSuccess()
     }

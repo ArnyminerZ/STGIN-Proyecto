@@ -12,5 +12,9 @@ data class SerializableMatch(
     val finishedAt: Long?,
     val game: Game,
     val user1Id: String,
-    val user2Id: String?
+    val user1Accepted: Boolean,
+    val user1Ready: Boolean,
+    val user2Id: String?,
+    val user2Accepted: Boolean,
+    val user2Ready: Boolean,
 )

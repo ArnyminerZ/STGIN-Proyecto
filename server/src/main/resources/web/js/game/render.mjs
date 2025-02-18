@@ -1,4 +1,4 @@
-import {loadingIndicator, showSnackbar} from "../ui.mjs";
+import {loadingIndicator, setElementEnabled, showSnackbar} from "../ui.mjs";
 import {BoatsDragging} from "./initial_dragging.mjs";
 import {rotateBoat, updateBoatElementRotation} from "./initial_setup.mjs";
 import {equalPositions, positionHitsBoat} from "./math.mjs";
@@ -110,7 +110,7 @@ function renderGrid(
 function resetCells() {
     const cells = document.getElementsByClassName('cell');
     // strange workaround, because for some reason for-loops do not work correctly
-    while(cells[0]) {
+    while (cells[0]) {
         cells[0].parentNode.removeChild(cells[0]);
     }
 }
@@ -194,13 +194,42 @@ function resetBoats() {
 export async function renderGame(match, socket) {
     const game = match.game;
     const hasStarted = match.startedAt != null;
+    const isWaiting = !match.user1Accepted || !match.user2Accepted;
 
-    /** @type {Player} */
-    const player = getPlayer();
+    /** @type {Player} */ const player = getPlayer(match);
 
-    const boardElement = document.getElementById('board');
     const opponentBoardElement = document.getElementById('opponentBoard');
+    /** @type {HTMLDivElement} */
+    const boardElement = document.getElementById('board');
+    /** @type {HTMLDivElement} */
+    const boatsElement = document.getElementById('boatsBox');
+
     const opponentPlayer = opponent(player);
+
+    //<editor-fold desc="Update toolbar">
+    /** @type {HTMLButtonElement} */ const newMatchButton = document.getElementById('newMatchButton');
+    /** @type {HTMLButtonElement} */ const startMatchButton = document.getElementById('startMatchButton');
+    /** @type {HTMLButtonElement} */ const stopMatchButton = document.getElementById('stopMatchButton');
+    /** @type {HTMLHeadElement} */ const waitingForConfirmationMessage = document.getElementById('waitingForConfirmation');
+    /** @type {HTMLHeadElement} */ const invitedMatchesMessage = document.getElementById('invitedMatches');
+    /** @type {HTMLUListElement} */ const invitedMatchesList = document.getElementById('invitedMatchesList');
+    /** @type {HTMLHeadElement} */ const playingMatchMessage = document.getElementById('playingMatch');
+    /** @type {HTMLHeadElement} */ const playingMatchAgainstMessage = document.getElementById('matchAgainst');
+
+    setElementEnabled(newMatchButton, false)
+    setElementEnabled(startMatchButton, !hasStarted)
+    setElementEnabled(stopMatchButton, true)
+
+    waitingForConfirmationMessage.style.display = !isWaiting ? 'none' : '';
+    invitedMatchesMessage.style.display = 'none';
+    invitedMatchesList.style.display = 'none';
+
+    playingMatchMessage.style.display = 'block';
+    playingMatchAgainstMessage.innerText = (player === 'PLAYER1' ? match.user2Id : match.user1Id) ?? 'La Máquina';
+
+    boardElement.style.display = isWaiting ? 'none' : 'block';
+    boatsElement.style.display = isWaiting ? 'none' : 'block';
+    //</editor-fold>
 
     resetBoats();
     resetCells();

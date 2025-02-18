@@ -7,7 +7,7 @@ import {Match} from '../data/match.mjs';
 export function getMatch() {
     const json = sessionStorage.getItem("match");
     if (json != null) {
-        return Match.fromJSON(json);
+        return Match.fromJSONString(json);
     } else {
         return null;
     }
@@ -53,10 +53,11 @@ export function clearUsername() {
 
 /**
  * Uses `getUsername` and `getMatch` to get the current player.
+ * @param {Match|null} match If null, defaults to `getMatch`.
  * @return {Player}
  */
-export function getPlayer() {
-    const match = getMatch();
+export function getPlayer(match = null) {
+    const _match = match ?? getMatch();
     const username = getUsername();
     return match.user1Id === username ? 'PLAYER1' : 'PLAYER2';
 }

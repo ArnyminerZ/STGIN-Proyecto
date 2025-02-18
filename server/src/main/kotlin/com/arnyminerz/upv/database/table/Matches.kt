@@ -26,6 +26,7 @@ object Matches: IntIdTable("Matches") {
      */
     val user1 = reference("user1", Users)
 
+    val user1Accepted = bool("user1_accepted").default(false)
     val user1Ready = bool("user1_ready").default(false)
 
     /**
@@ -34,5 +35,6 @@ object Matches: IntIdTable("Matches") {
      */
     val user2 = reference("user2", Users).nullable()
 
+    val user2Accepted = bool("user2_accepted").default(false)
     val user2Ready = bool("user2_ready").default(false)
 }

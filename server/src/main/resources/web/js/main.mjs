@@ -1,11 +1,13 @@
 import {checkSession} from "./session.mjs";
 import {get, post} from "./requests.js";
 import {renderGame} from "./game/render.mjs";
-import {getMatch, setMatch, setUsername} from "./game/storage.js";
-import {showSnackbar} from "./ui.mjs";
+import {getMatch, getPlayer, setMatch, setUsername} from "./game/storage.js";
+import {setElementEnabled, showSnackbar} from "./ui.mjs";
 import {ServerResponseException} from "./exceptions.js";
 import {listAvailableOpponents} from "./game/chooser.mjs";
 import {handleActionMessage, handleStateMessage} from "./game/live.mjs";
+import {opponent} from "./game/lookup.js";
+import {Match} from "./data/match.mjs";
 
 /**
  * Creates a new match, optionally against a specific user.
@@ -29,9 +31,25 @@ async function newMatch(againstUserId = null) {
  */
 async function fetchMatch(matchId) {
     const response = await get(`/api/matches/${matchId}`);
-    return response.ok ? await response.json() : null;
+    return response.ok ? Match.fromJSON(await response.json()) : null;
 }
 
+/**
+ * Refreshes the current value of `getMatch` by calling the server again.
+ * If there's no match stored, this function does nothing and returns `null`.
+ * @returns {Promise<Match|null>}
+ */
+export async function refreshMatch() {
+    let match = getMatch();
+    if (match == null) return null;
+    match = await fetchMatch(match.id);
+    setMatch(match);
+    return match;
+}
+
+/**
+ * @returns {Promise<Match[]>}
+ */
 async function fetchMatches() {
     const response = await get('/api/matches');
     /** @type {int[]} */
@@ -111,9 +129,8 @@ window.addEventListener('load', async () => {
 
     const matches = await fetchMatches();
     const pendingMatches = matches.filter(match => match.finishedAt == null);
+    const acceptedMatches = pendingMatches.filter(match => match.isAccepted());
     const startedMatch = matches.find(match => match.startedAt != null && match.finishedAt == null);
-
-    console.info(matches);
 
     /** @type {HTMLButtonElement} */
     const newMatchButton = document.getElementById('newMatchButton');
@@ -123,14 +140,16 @@ window.addEventListener('load', async () => {
     const stopMatchButton = document.getElementById('stopMatchButton');
     /** @type {HTMLDialogElement} */
     const chooseOpponentDialog = document.getElementById('chooseOpponentDialog');
+
     /** @type {HTMLHeadElement} */
-    const pendingMatchMessage = document.getElementById('pendingMatch');
+    const invitedMatchesMessage = document.getElementById('invitedMatches');
+    /** @type {HTMLUListElement} */
+    const invitedMatchesList = document.getElementById('invitedMatchesList');
+
     /** @type {HTMLHeadElement} */
-    const pendingMatchAgainstMessage = document.getElementById('pendingMatchAgainst');
+    const playingMatchMessage = document.getElementById('playingMatch');
     /** @type {HTMLHeadElement} */
-    const startedMatchMessage = document.getElementById('startedMatch');
-    /** @type {HTMLHeadElement} */
-    const startedMatchAgainstMessage = document.getElementById('startedMatchAgainst');
+    const playingMatchAgainstMessage = document.getElementById('matchAgainst');
     /** @type {HTMLDivElement} */
     const boardElement = document.getElementById('board');
     /** @type {HTMLDivElement} */
@@ -226,60 +245,71 @@ window.addEventListener('load', async () => {
         // There is a started match
         console.log('Started match:', startedMatch);
 
-        newMatchButton.setAttribute('disabled', 'true');
-        startMatchButton.setAttribute('disabled', 'true');
-        stopMatchButton.removeAttribute('disabled');
-
-        pendingMatchMessage.style.display = 'none';
-        pendingMatchAgainstMessage.innerText = '';
-
-        startedMatchMessage.style.display = 'block';
-        pendingMatchAgainstMessage.innerText = (startedMatch.user1Id === username ? startedMatch.user2Id : startedMatch.user1Id) ?? 'La Máquina';
-
-        boardElement.style.display = 'block';
-        boatsElement.style.display = 'block';
-
         // Join it automatically
         await joinMatch(startedMatch);
-
-        document.getElementById('matchLoadingIndicator').style.display = 'none';
     } else if (pendingMatches.length > 0) {
         // There's at least a pending match
-        const pendingMatch = pendingMatches[0];
+        if (acceptedMatches.length > 0) {
+            // The user has accepted or created a match
+            console.info('The user is waiting the other part to accept');
 
-        console.log('Pending match:', pendingMatch);
+            // Join the accepted match
+            await joinMatch(acceptedMatches[0]);
+        } else {
+            // The user has at least one invitation but still has not accepted any
+            setElementEnabled(newMatchButton, false)
+            setElementEnabled(startMatchButton, false)
+            setElementEnabled(stopMatchButton, false)
 
-        newMatchButton.setAttribute('disabled', 'true');
-        startMatchButton.removeAttribute('disabled');
-        stopMatchButton.setAttribute('disabled', 'true');
+            invitedMatchesMessage.style.display = 'block';
+            invitedMatchesList.style.display = 'block';
 
-        pendingMatchMessage.style.display = 'block';
-        pendingMatchAgainstMessage.innerText = (pendingMatch.user1Id === username ? pendingMatch.user2Id : pendingMatch.user1Id) ?? 'La Máquina';
+            // Remove laying children
+            for (let child of invitedMatchesList.children) child.remove();
 
-        startedMatchMessage.style.display = 'none';
-        startedMatchAgainstMessage.innerText = '';
+            console.info('The user has pending invitations');
 
-        boardElement.style.display = 'block';
-        boatsElement.style.display = 'block';
+            for (const match of pendingMatches) {
+                console.log('Pending match:', match);
+                const player = getPlayer(match);
+                const against = opponent(player);
 
-        // Join it automatically
-        await joinMatch(pendingMatch);
+                const element = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = '#';
+                link.innerText = match.getUserId(against);
+                link.addEventListener('click', async function (event) {
+                    event.preventDefault();
 
-        document.getElementById('matchLoadingIndicator').style.display = 'none';
+                    try {
+                        await match.accept();
+
+                        // Join the accepted match
+                        await joinMatch(await refreshMatch());
+                    } catch (e) {
+                        console.error(e);
+                        showSnackbar(e)
+                    }
+                })
+                element.append(link);
+                invitedMatchesList.append(element);
+            }
+        }
     } else {
         // No games started or pending
         console.log('No pending matches');
 
-        newMatchButton.removeAttribute('disabled');
-        startMatchButton.setAttribute('disabled', 'true');
-        stopMatchButton.setAttribute('disabled', 'true');
+        setElementEnabled(newMatchButton, true)
+        setElementEnabled(startMatchButton, false)
+        setElementEnabled(stopMatchButton, false)
 
-        pendingMatchMessage.style.display = 'none';
-        startedMatchMessage.style.display = 'none';
+        invitedMatchesMessage.style.display = 'none';
+        invitedMatchesList.style.display = 'none';
+
+        playingMatchMessage.style.display = 'none';
 
         boardElement.style.display = 'none';
         boatsElement.style.display = 'none';
-
-        document.getElementById('matchLoadingIndicator').style.display = 'none';
     }
+    document.getElementById('matchLoadingIndicator').style.display = 'none';
 });

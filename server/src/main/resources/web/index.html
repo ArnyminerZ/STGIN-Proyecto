@@ -17,8 +17,10 @@
 <body>
 <h1>Juego de Barquitos</h1>
 <h2>Bienvenido de vuelta, <span id="username" class="shimmer">██████</span></h2>
-<h3 id="pendingMatch" style="display: none">Tienes una partida pendiente contra <span id="pendingMatchAgainst"></span></h3>
-<h3 id="startedMatch" style="display: none">Jugando contra <span id="startedMatchAgainst"></span></h3>
+<h3 id="invitedMatches" style="display: none">Tienes las siguientes invitaciones:</h3>
+<ul id="invitedMatchesList" style="display: none"></ul>
+<h3 id="waitingForConfirmation" style="display: none">Esperando confirmación...</h3>
+<h3 id="playingMatch" style="display: none">Jugando contra <span id="matchAgainst"></span></h3>
 
 <div id="toolbar">
     <button id="newMatchButton" disabled>Nueva Partida</button>

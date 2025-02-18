@@ -159,10 +159,7 @@ object GameEndpoint : Websocket(Endpoints.Game.GAME) {
             throw ClassNotFoundException("Could not find match with id $matchId")
         }
 
-        ServerDatabase {
-            match.winner = if (type.player == Player.PLAYER1) 1 else 2
-            match.finishedAt = Instant.now()
-        }
+        match.finish(type.player.other())
 
         logger.info("${type.player} has given up for match $matchId")
     }

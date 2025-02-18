@@ -1,6 +1,7 @@
 import {getMatch, getUsername, setMatch} from "./storage.js";
 import {renderGame} from "./render.mjs";
 import {showSnackbar} from "../ui.mjs";
+import {refreshMatch} from "../main.mjs";
 
 /**
  * Handles a received action message.
@@ -54,9 +55,9 @@ export async function handleStateMessage(cmd, socket) {
     // Make sure the message received is a state
     if (split[0] !== 'STATE') return
     // Extract the timestamp
-    const timestamp = parseInt(split[1]);
+    // const timestamp = parseInt(split[1]);
     // Extract the match id
-    const matchId = split[2];
+    // const matchId = split[2];
     // Extract the type
     const stateName = split[3];
     switch (stateName) {
@@ -67,8 +68,15 @@ export async function handleStateMessage(cmd, socket) {
                 showSnackbar('Los dos jugadores están listos')
             } else if (player1Ready) {
                 showSnackbar('El jugador 1 está listo')
-            } else {
+            } else if (player2Ready) {
                 showSnackbar('El jugador 2 está listo')
+            } else {
+                // This is the first preparation message, it means that both users have now accepted the match.
+                // Render the game
+                showSnackbar('Los dos jugadores han aceptado el reto');
+                const match = await refreshMatch();
+
+                await renderGame(match, socket);
             }
             break;
         }
@@ -86,6 +94,8 @@ export async function handleStateMessage(cmd, socket) {
             const winnerPlayer = split[4];
             const winner = winnerPlayer === 'PLAYER1' ? match.user1Id : match?.user2Id;
             showSnackbar(`${winner ?? 'La Máquina'} ha ganado la partida`)
+
+            setTimeout(() => window.location.reload(), 3000);
             break;
         }
         default:
