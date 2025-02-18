@@ -18,4 +18,5 @@ object ErrorCodes {
     const val MATCH_ALREADY_FINISHED = 15
     const val INVALID_POSITION = 16
     const val NOT_YOUR_TURN = 17
+    const val WRONG_PASSWORD = 18
 }

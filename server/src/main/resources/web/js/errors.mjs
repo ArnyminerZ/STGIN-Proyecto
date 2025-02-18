@@ -1,5 +1,11 @@
 import {queryString} from "./url.mjs";
-import {MISSING_CREDENTIALS, INVALID_CREDENTIALS, USER_ALREADY_EXISTS} from "../js_gen/error_codes.mjs";
+import {
+    MISSING_CREDENTIALS,
+    INVALID_CREDENTIALS,
+    USER_ALREADY_EXISTS,
+    USER_NOT_FOUND,
+    WRONG_PASSWORD
+} from "../js_gen/error_codes.mjs";
 
 export function showErrorInField(fieldId) {
     const query = queryString();
@@ -19,6 +25,14 @@ export function showErrorInField(fieldId) {
         }
         case INVALID_CREDENTIALS: {
             error = 'Las credenciales no son válidas. El nombre de usuario debe tener más de 3 caracteres, y la contraseña más de 6.'
+            break;
+        }
+        case WRONG_PASSWORD: {
+            error = 'La contraseña no es correcta.';
+            break;
+        }
+        case USER_NOT_FOUND: {
+            error = 'El usuario no existe.'
             break;
         }
         case USER_ALREADY_EXISTS: {

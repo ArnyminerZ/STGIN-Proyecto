@@ -12,6 +12,9 @@ object Errors {
     data object InvalidCredentials : Error(ErrorCodes.INVALID_CREDENTIALS, "Invalid credentials.")
 
     @Serializable
+    data object WrongPassword : Error(ErrorCodes.WRONG_PASSWORD, "Wrong password.")
+
+    @Serializable
     data object UserAlreadyExists : Error(ErrorCodes.USER_ALREADY_EXISTS, "User already exists.")
 
     @Serializable

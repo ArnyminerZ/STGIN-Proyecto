@@ -30,11 +30,12 @@ object LoginEndpoint : Endpoint(Endpoints.Auth.LOGIN, HttpMethod.Post) {
 
         val user = ServerDatabase { User.findById(username) }
         if (user == null) {
-            respondFailure(Errors.InvalidCredentials)
+            // This is a bad pattern since allows user scrapping, but we use it for the sake of simplicity
+            respondFailure(Errors.UserNotFound)
         }
         val (hash, salt) = user!!.hash to user.salt
         if (!Passwords.verify(salt, hash, password)) {
-            respondFailure(Errors.InvalidCredentials)
+            respondFailure(Errors.WrongPassword)
         }
 
         val sessionId = Uuid.random()
