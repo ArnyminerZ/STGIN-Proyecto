@@ -1,10 +1,5 @@
 import {queryString} from "./url.mjs";
-
-export const Auth = {
-    MissingCredentials: 1,
-    InvalidCredentials: 2,
-    UserAlreadyExists: 3,
-}
+import {MISSING_CREDENTIALS, INVALID_CREDENTIALS, USER_ALREADY_EXISTS} from "../js_gen/error_codes.mjs";
 
 export function showErrorInField(fieldId) {
     const query = queryString();
@@ -18,15 +13,15 @@ export function showErrorInField(fieldId) {
     let error = null;
     const errorElement = document.getElementById(fieldId);
     switch (errorCode) {
-        case Auth.MissingCredentials: {
+        case MISSING_CREDENTIALS: {
             error = 'No se han enviado credenciales. Error interno, contacte con el administrador'
             break;
         }
-        case Auth.InvalidCredentials: {
+        case INVALID_CREDENTIALS: {
             error = 'Las credenciales no son válidas. El nombre de usuario debe tener más de 3 caracteres, y la contraseña más de 6.'
             break;
         }
-        case Auth.UserAlreadyExists: {
+        case USER_ALREADY_EXISTS: {
             error = 'El usuario ya existe'
             break;
         }

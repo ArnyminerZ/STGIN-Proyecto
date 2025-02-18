@@ -1,3 +1,6 @@
+import kotlin.io.path.div
+import kotlin.io.path.readLines
+
 plugins {
     alias(libs.plugins.jvm)
     alias(libs.plugins.kotlinx.serialization)
@@ -16,6 +19,19 @@ application {
 
 repositories {
     mavenCentral()
+}
+
+val srcDir = File(projectDir, "src")
+val mainDir = File(srcDir, "main")
+val resourcesDir = File(mainDir, "resources")
+val webDir = File(resourcesDir, "web")
+val generatedJsDir = File(webDir, "js_gen")
+    .also { it.mkdirs() }
+
+sourceSets {
+    main {
+        resources.srcDir(generatedJsDir.parentFile)
+    }
 }
 
 dependencies {
@@ -56,4 +72,25 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(23)
+}
+
+val generateErrorCodes = tasks.register("generateErrorCodes") {
+    val file = rootProject.rootDir.toPath() / "shared" / "src" / "commonMain" / "kotlin" / "error" / "ErrorCodes.kt"
+    val lines = file.readLines()
+        .map { it.trim() }
+        .filter { it.startsWith("const val") }
+        .map { line ->
+            "export " + line.replace("val ", "")
+        }
+    File(generatedJsDir, "error_codes.mjs").let { outputFile ->
+        if (outputFile.exists()) outputFile.delete()
+        outputFile.outputStream().bufferedWriter().use { output ->
+            output.write(lines.joinToString("\n"))
+        }
+        println("Written error codes module to $outputFile")
+    }
+}
+
+tasks.named("processResources") {
+    dependsOn(generateErrorCodes)
 }

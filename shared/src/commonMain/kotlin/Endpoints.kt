@@ -2,17 +2,17 @@ object Endpoints {
     const val ROOT = "/"
 
     object Auth {
-        const val LOGIN = "/api/auth/login"
-        const val REGISTER = "/api/auth/register"
-        const val LOGOUT = "/api/auth/logout"
+        const val LOGIN = "/auth/login"
+        const val REGISTER = "/auth/register"
+        const val LOGOUT = "/auth/logout"
     }
 
     object Game {
-        const val GAME = "/api/matches/{id}/socket"
-        const val MATCHES = "/api/matches"
-        const val MATCH = "/api/matches/{id}"
-        const val MATCH_READY = "/api/matches/{id}/is_ready"
-        const val MATCH_PLACE = "/api/matches/{id}/place"
-        const val MATCH_START = "/api/matches/{id}/start"
+        const val GAME = "/matches/{id}/socket"
+        const val MATCHES = "/matches"
+        const val MATCH = "/matches/{id}"
+        const val MATCH_READY = "/matches/{id}/is_ready"
+        const val MATCH_PLACE = "/matches/{id}/place"
+        const val MATCH_START = "/matches/{id}/start"
     }
 }

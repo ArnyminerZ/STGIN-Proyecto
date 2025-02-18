@@ -20,6 +20,7 @@ import io.ktor.server.http.content.staticResources
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.webSocket
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -64,11 +65,13 @@ fun Application.configureRouting() {
     routing {
         staticResources("/", "web")
 
-        for (endpoint in endpoints) {
-            registerEndpoint(endpoint)
-        }
-        for (webSocket in webSockets) {
-            webSocket(path = webSocket.route, handler = webSocket.handler)
+        route("/api") {
+            for (endpoint in endpoints) {
+                registerEndpoint(endpoint)
+            }
+            for (webSocket in webSockets) {
+                webSocket(path = webSocket.route, handler = webSocket.handler)
+            }
         }
     }
 }
