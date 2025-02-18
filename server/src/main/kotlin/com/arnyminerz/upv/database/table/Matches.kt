@@ -26,9 +26,13 @@ object Matches: IntIdTable("Matches") {
      */
     val user1 = reference("user1", Users)
 
+    val user1Ready = bool("user1_ready").default(false)
+
     /**
      * Represents a nullable reference to a second user associated with a match in the `Matches` table.
      * This allows for the possibility that a match may not involve a second user (e.g., a game against the machine).
      */
     val user2 = reference("user2", Users).nullable()
+
+    val user2Ready = bool("user2_ready").default(false)
 }

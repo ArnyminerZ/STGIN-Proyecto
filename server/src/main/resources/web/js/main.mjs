@@ -5,6 +5,7 @@ import {getMatch, setMatch, setUsername} from "./game/storage.js";
 import {showSnackbar} from "./ui.mjs";
 import {ServerResponseException} from "./exceptions.js";
 import {listAvailableOpponents} from "./game/chooser.mjs";
+import {handleActionMessage, handleStateMessage} from "./game/live.mjs";
 
 /**
  * Creates a new match, optionally against a specific user.
@@ -158,36 +159,19 @@ window.addEventListener('load', async () => {
             const cmd = event.data;
             console.log('WS', 'Received message:', cmd);
             const split = cmd.split(':');
-            // Make sure the message received is an action
-            if (split[0] !== 'ACTION') return
-            // Extract the timestamp
-            const timestamp = parseInt(split[1]);
-            // Extract the match id
-            const matchId = split[2];
-            // Extract the type
-            const actionType = split[3];
-            switch (actionType) {
-                case 'DropBomb':
-                    const player = split[4];
-                    const position = split[5].split(',');
-                    const x = parseInt(position[0]);
-                    const y = parseInt(position[1]);
-                    const match = getMatch();
-                    let username;
-                    if (player === 'PLAYER1') {
-                        match.game.player1Bombs.push({x, y});
-                        username = match.game.setupPlayer1.playerId;
-                    } else {
-                        match.game.player2Bombs.push({x, y});
-                        username = match.game.setupPlayer2.playerId;
-                    }
-                    setMatch(match);
-                    console.debug('User:', username, 'dropped a bomb on', x, ',', y);
-                    await renderGame(username, match, socket);
+            switch (split[0]) {
+                case 'ACTION': {
+                    await handleActionMessage(cmd, socket);
                     break;
-                default:
-                    console.info('Got an unknown action type:', actionType);
+                }
+                case 'STATE': {
+                    await handleStateMessage(cmd, socket);
                     break;
+                }
+                default: {
+                    console.warn('Received an unknown message type:', split[0])
+                    break;
+                }
             }
         };
 
@@ -208,7 +192,7 @@ window.addEventListener('load', async () => {
             console.error('Websocket error:', error);
         };
 
-        await renderGame(username, match, socket);
+        await renderGame(match, socket);
     }
 
     newMatchButton.addEventListener('click', async () => {
@@ -220,9 +204,6 @@ window.addEventListener('load', async () => {
         showSnackbar('Iniciando partida...');
         try {
             await getMatch().start();
-
-            // TODO: Handle game start correctly
-            window.location.reload();
         } catch (error) {
             if (error instanceof ServerResponseException) {
                 showSnackbar(error.message)

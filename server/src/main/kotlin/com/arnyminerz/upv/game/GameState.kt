@@ -14,9 +14,9 @@ class GameState(
         /**
          * The game is still not complete, players still need to place some boats.
          */
-        data object Preparation : State {
+        data class Preparation(val user1Ready: Boolean, val user2Ready: Boolean) : State {
             override fun toString(): String {
-                return "PREPARATION"
+                return "PREPARATION:$user1Ready:$user2Ready"
             }
         }
 

@@ -2,6 +2,8 @@ package com.arnyminerz.upv.database.entity
 
 import com.arnyminerz.upv.database.ServerDatabase
 import com.arnyminerz.upv.database.table.Matches
+import com.arnyminerz.upv.game.GameState
+import com.arnyminerz.upv.game.Orchestrator
 import com.arnyminerz.upv.game.Setup
 import com.arnyminerz.upv.response.SerializableMatch
 import game.Player
@@ -25,7 +27,25 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
     var user1 by User referencedOn Matches.user1
     var user2 by User optionalReferencedOn Matches.user2
 
+    var user1Ready by Matches.user1Ready
+    var user2Ready by Matches.user2Ready
+
     suspend fun isReady(): Boolean = ServerDatabase { game.isReady(user2 == null) }
+
+    suspend fun isReady(player: Player): Boolean = ServerDatabase { game.isReady(player) }
+
+    suspend fun markReady(userId: String) {
+        val player = player(userId) ?: error("Could not mark the machine as ready")
+        check(isReady(player)) { "Player is not ready" }
+
+        ServerDatabase {
+            if (user1.id.value == userId) user1Ready = true
+            else if (user2?.id?.value == userId) user2Ready = true
+            else error("Invalid userId: $userId")
+        }
+
+        notifyState(GameState.State.Preparation(user1Ready, user2Ready))
+    }
 
     /**
      * Starts the match by performing necessary setup and validations.
@@ -44,6 +64,8 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
         }
 
         startedAt = Instant.now()
+
+        notifyState(GameState.State.Ready)
     }
 
     suspend fun serializable(): SerializableMatch = ServerDatabase {
@@ -70,4 +92,6 @@ class Match(id: EntityID<Int>) : IntEntity(id) {
             else -> null
         }
     }
+
+    suspend fun notifyState(state: GameState.State) = Orchestrator.notifyState(matchId = this@Match.id.value, state)
 }

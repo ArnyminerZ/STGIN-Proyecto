@@ -21,6 +21,8 @@ data class Game(
 ) {
     fun isReady(vsMachine: Boolean): Boolean = setupPlayer1.isReady() && (vsMachine || setupPlayer2.isReady())
 
+    fun isReady(player: Player): Boolean = if (player == Player.PLAYER1) setupPlayer1.isReady() else setupPlayer2.isReady()
+
     fun turn(): Player = if (player2Bombs.size < player1Bombs.size) Player.PLAYER2 else Player.PLAYER1
 
     fun setup(player: Player): Setup = if (player == Player.PLAYER1) setupPlayer1 else setupPlayer2

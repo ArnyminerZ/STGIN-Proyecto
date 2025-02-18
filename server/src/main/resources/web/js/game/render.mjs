@@ -4,6 +4,7 @@ import {rotateBoat, updateBoatElementRotation} from "./initial_setup.mjs";
 import {equalPositions, positionHitsBoat} from "./math.mjs";
 import {opponent, playerBoats, playerBombs} from "./lookup.js";
 import {bomb} from "./playing.mjs";
+import {getUsername} from "./storage.js";
 
 /**
  * @callback ClickCellCallback
@@ -44,6 +45,7 @@ function renderGrid(
     isEnabled = false,
     applyLeftPadding = false
 ) {
+    console.log('Rendering grid for', player);
     const board = game.board;
     console.log('Board size is', board.columns, 'columns x', board.rows, 'rows.')
     const [boardWidthPx, boardHeightPx] = calculateBoardSizePx(board);
@@ -156,7 +158,9 @@ function forbidDraggingBoats() {
  * @param {Player} player
  */
 function moveBoats(game, player) {
+    console.log('Placing boats of', player);
     const setup = player === 'PLAYER1' ? game.setupPlayer1 : game.setupPlayer2;
+    console.log('Player has', setup.positions.length, 'positioned boats');
     for (const positionedBoat of setup.positions) {
         const boatElement = document.querySelector(`[data-boat=${positionedBoat.boat.name}]`);
         if (boatElement == null) {
@@ -184,13 +188,16 @@ function resetBoats() {
 }
 
 /**
- * @param {Player} player
  * @param {Match} match
  * @param {WebSocket} socket
  */
-export async function renderGame(player, match, socket) {
+export async function renderGame(match, socket) {
     const game = match.game;
     const hasStarted = match.startedAt != null;
+
+    const username = getUsername();
+    /** @type {Player} */
+    const player = match.user1Id === username ? 'PLAYER1' : 'PLAYER2';
 
     const boardElement = document.getElementById('board');
     const opponentBoardElement = document.getElementById('opponentBoard');

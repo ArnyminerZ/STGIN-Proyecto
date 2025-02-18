@@ -2,8 +2,10 @@ package com.arnyminerz.upv.endpoint.game
 
 import Endpoints
 import com.arnyminerz.upv.database.entity.Match
+import com.arnyminerz.upv.endpoint.game.StartMatchEndpoint.respondSuccess
 import com.arnyminerz.upv.endpoint.type.EndpointContext
 import com.arnyminerz.upv.error.Errors
+import com.arnyminerz.upv.game.GameState
 import io.ktor.http.HttpMethod
 
 /**
@@ -11,15 +13,22 @@ import io.ktor.http.HttpMethod
  */
 object StartMatchEndpoint : MatchBaseEndpoint(Endpoints.Game.MATCH_START, HttpMethod.Post) {
     override suspend fun EndpointContext.matchBody(userId: String, match: Match) {
-        if (!match.isReady()) {
-            respondFailure(Errors.MatchNotReady)
-        }
         if (match.startedAt != null) {
             respondFailure(Errors.MatchAlreadyStarted)
         }
 
-        match.start()
+        try {
+            match.markReady(userId)
+        } catch (_: IllegalStateException) {
+            respondFailure(Errors.MatchNotReady)
+        }
 
-        respondSuccess()
+        if (match.isReady()) {
+            match.start()
+
+            respondSuccess()
+        } else {
+            respondSuccess()
+        }
     }
 }

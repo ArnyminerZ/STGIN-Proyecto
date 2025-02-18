@@ -36,7 +36,7 @@ export class Match {
         const response = await post(`/api/matches/${this.id}/start`, {});
         if (response.ok) {
             // TODO: Handle game start correctly
-            window.location.reload();
+            // window.location.reload();
         } else {
             const error = await response.json();
             throw new ServerResponseException(JSON.stringify(error))
