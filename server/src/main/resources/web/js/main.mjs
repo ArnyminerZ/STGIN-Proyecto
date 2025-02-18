@@ -235,10 +235,10 @@ window.addEventListener('load', async () => {
 
     loadAvailableOpponents();
 
-    console.log('Started match: ', startedMatch)
-
     if (startedMatch != null) {
         // There is a started match
+        console.log('Started match:', startedMatch);
+
         newMatchButton.setAttribute('disabled', 'true');
         startMatchButton.setAttribute('disabled', 'true');
         stopMatchButton.removeAttribute('disabled');
@@ -247,7 +247,7 @@ window.addEventListener('load', async () => {
         pendingMatchAgainstMessage.innerText = '';
 
         startedMatchMessage.style.display = 'block';
-        startedMatchAgainstMessage.innerText = startedMatch.user2Id ?? 'La Máquina';
+        pendingMatchAgainstMessage.innerText = (startedMatch.user1Id === username ? startedMatch.user2Id : startedMatch.user1Id) ?? 'La Máquina';
 
         boardElement.style.display = 'block';
         boatsElement.style.display = 'block';
@@ -260,12 +260,14 @@ window.addEventListener('load', async () => {
         // There's at least a pending match
         const pendingMatch = pendingMatches[0];
 
+        console.log('Pending match:', pendingMatch);
+
         newMatchButton.setAttribute('disabled', 'true');
         startMatchButton.removeAttribute('disabled');
         stopMatchButton.setAttribute('disabled', 'true');
 
         pendingMatchMessage.style.display = 'block';
-        pendingMatchAgainstMessage.innerText = pendingMatch.user2Id ?? 'La Máquina';
+        pendingMatchAgainstMessage.innerText = (pendingMatch.user1Id === username ? pendingMatch.user2Id : pendingMatch.user1Id) ?? 'La Máquina';
 
         startedMatchMessage.style.display = 'none';
         startedMatchAgainstMessage.innerText = '';
@@ -279,6 +281,8 @@ window.addEventListener('load', async () => {
         document.getElementById('matchLoadingIndicator').style.display = 'none';
     } else {
         // No games started or pending
+        console.log('No pending matches');
+
         newMatchButton.removeAttribute('disabled');
         startMatchButton.setAttribute('disabled', 'true');
         stopMatchButton.setAttribute('disabled', 'true');
