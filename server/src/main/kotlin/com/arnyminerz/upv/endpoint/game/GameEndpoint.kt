@@ -14,6 +14,7 @@ import game.Player
 import game.Position
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import java.time.Instant
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.uuid.ExperimentalUuidApi
 import kotlinx.coroutines.channels.consumeEach
@@ -158,6 +159,11 @@ object GameEndpoint : Websocket(Endpoints.Game.GAME) {
             throw ClassNotFoundException("Could not find match with id $matchId")
         }
 
-        ServerDatabase { match.winner = if (type.player == Player.PLAYER1) 1 else 2 }
+        ServerDatabase {
+            match.winner = if (type.player == Player.PLAYER1) 1 else 2
+            match.finishedAt = Instant.now()
+        }
+
+        logger.info("${type.player} has given up for match $matchId")
     }
 }

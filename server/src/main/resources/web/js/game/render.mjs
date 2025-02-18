@@ -4,7 +4,7 @@ import {rotateBoat, updateBoatElementRotation} from "./initial_setup.mjs";
 import {equalPositions, positionHitsBoat} from "./math.mjs";
 import {opponent, playerBoats, playerBombs} from "./lookup.js";
 import {bomb} from "./playing.mjs";
-import {getUsername} from "./storage.js";
+import {getPlayer, getUsername} from "./storage.js";
 
 /**
  * @callback ClickCellCallback
@@ -195,9 +195,8 @@ export async function renderGame(match, socket) {
     const game = match.game;
     const hasStarted = match.startedAt != null;
 
-    const username = getUsername();
     /** @type {Player} */
-    const player = match.user1Id === username ? 'PLAYER1' : 'PLAYER2';
+    const player = getPlayer();
 
     const boardElement = document.getElementById('board');
     const opponentBoardElement = document.getElementById('opponentBoard');

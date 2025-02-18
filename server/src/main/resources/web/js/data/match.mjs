@@ -1,5 +1,6 @@
 import {post} from "../requests.js";
 import {ServerResponseException} from "../exceptions.js";
+import {getPlayer, getUsername} from "../game/storage.js";
 
 export class Match {
     /** @type {number} */ id
@@ -41,5 +42,17 @@ export class Match {
             const error = await response.json();
             throw new ServerResponseException(JSON.stringify(error))
         }
+    }
+
+    /**
+     * Sends a give up command through the socket.
+     * @param {WebSocket} socket
+     * @returns {Promise<void>}
+     */
+    async giveUp(socket) {
+        const now = Date.now();
+        const player = getPlayer();
+        console.info('Giving up as', player);
+        socket.send(`ACTION:${now}:${this.id}:GiveUp:${player}`)
     }
 }

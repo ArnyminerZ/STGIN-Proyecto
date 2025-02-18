@@ -80,6 +80,14 @@ export async function handleStateMessage(cmd, socket) {
 
             break;
         }
+        case 'ENDED': {
+            const match = await getMatch();
+            /** @type {Player} */
+            const winnerPlayer = split[4];
+            const winner = winnerPlayer === 'PLAYER1' ? match.user1Id : match?.user2Id;
+            showSnackbar(`${winner ?? 'La Máquina'} ha ganado la partida`)
+            break;
+        }
         default:
             console.info('Got an unknown state type:', stateName);
             break;

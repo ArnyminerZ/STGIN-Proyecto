@@ -50,3 +50,13 @@ export function setUsername(username) {
 export function clearUsername() {
     sessionStorage.removeItem("username");
 }
+
+/**
+ * Uses `getUsername` and `getMatch` to get the current player.
+ * @return {Player}
+ */
+export function getPlayer() {
+    const match = getMatch();
+    const username = getUsername();
+    return match.user1Id === username ? 'PLAYER1' : 'PLAYER2';
+}

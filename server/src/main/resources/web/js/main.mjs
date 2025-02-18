@@ -159,7 +159,15 @@ window.addEventListener('load', async () => {
             const cmd = event.data;
             console.log('WS', 'Received message:', cmd);
             const split = cmd.split(':');
-            switch (split[0]) {
+            // Extract the message type
+            const messageType = split[0];
+            // Extract the match id
+            const matchId = split[2];
+
+            // Ignore messages for matches that are not this one
+            if (getMatch().id !== parseInt(matchId)) return
+
+            switch (messageType) {
                 case 'ACTION': {
                     await handleActionMessage(cmd, socket);
                     break;
@@ -169,7 +177,7 @@ window.addEventListener('load', async () => {
                     break;
                 }
                 default: {
-                    console.warn('Received an unknown message type:', split[0])
+                    console.warn('Received an unknown message type:', messageType)
                     break;
                 }
             }
@@ -196,8 +204,6 @@ window.addEventListener('load', async () => {
     }
 
     newMatchButton.addEventListener('click', async () => {
-        //await newMatch();
-        //window.location.reload();
         chooseOpponentDialog.showModal();
     });
     startMatchButton.addEventListener('click', async () => {
@@ -211,7 +217,7 @@ window.addEventListener('load', async () => {
         }
     });
     stopMatchButton.addEventListener('click', async () => {
-
+        await getMatch().giveUp(socket);
     });
 
     loadAvailableOpponents();
