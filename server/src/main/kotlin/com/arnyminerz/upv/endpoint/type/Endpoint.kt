@@ -8,6 +8,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.ParametersBuilder
+import io.ktor.http.URLBuilder
 import io.ktor.server.request.authorization
 import io.ktor.server.request.contentType
 import io.ktor.server.request.receiveParameters
@@ -67,7 +68,11 @@ abstract class Endpoint(val route: String, val method: HttpMethod = HttpMethod.G
 
         if (redirectTo != null) {
             call.respondRedirect(
-                (call.request.headers[HttpHeaders.Referrer] ?: redirectTo) + "?error=${error.code}"
+                URLBuilder(call.request.headers[HttpHeaders.Referrer] ?: redirectTo)
+                    .apply {
+                        parameters["error"] = error.code.toString()
+                    }
+                    .build()
             )
         } else {
             call.respond(error.httpStatusCode, error)
