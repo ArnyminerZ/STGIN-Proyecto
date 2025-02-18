@@ -12,8 +12,11 @@ import com.arnyminerz.upv.game.Game
 import com.arnyminerz.upv.game.Setup
 import com.arnyminerz.upv.request.NewMatchRequest
 import game.Board
+import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
-import io.ktor.server.request.receive
+import io.ktor.server.request.contentType
+import io.ktor.server.request.receiveText
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.and
 
 /**
@@ -21,11 +24,17 @@ import org.jetbrains.exposed.sql.and
  */
 object NewMatchEndpoint : SecureEndpoint(Endpoints.Game.MATCHES, HttpMethod.Post) {
     override suspend fun EndpointContext.secureBody(userId: String) {
-        val parameters = call.parameters
-        val seed = parameters["seed"]?.toIntOrNull() ?: 0
-
-        val body = call.receive(NewMatchRequest::class)
-        val (user2Id) = body
+        val seed: Int
+        val user2Id: String?
+        if (call.request.contentType() == ContentType.Application.Json) {
+            val body = call.receiveText()
+            val request = Json.decodeFromString(NewMatchRequest.serializer(), body)
+            seed = request.seed ?: 0
+            user2Id = request.otherPlayerId
+        } else {
+            seed = formParameters["seed"]?.toIntOrNull() ?: 0
+            user2Id = formParameters["againstUserId"].takeUnless { it == "null" }
+        }
 
         // Make sure the user is not challenging itself
         if (userId == user2Id) {

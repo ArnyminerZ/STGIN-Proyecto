@@ -10,6 +10,7 @@ import com.arnyminerz.upv.endpoint.game.MatchEndpoint
 import com.arnyminerz.upv.endpoint.game.MatchReadyEndpoint
 import com.arnyminerz.upv.endpoint.game.MatchesEndpoint
 import com.arnyminerz.upv.endpoint.game.NewMatchEndpoint
+import com.arnyminerz.upv.endpoint.game.OpponentsListEndpoint
 import com.arnyminerz.upv.endpoint.game.PlaceBoatMatchEndpoint
 import com.arnyminerz.upv.endpoint.game.StartMatchEndpoint
 import com.arnyminerz.upv.endpoint.type.Endpoint
@@ -36,6 +37,7 @@ private val endpoints = listOf(
     SessionEndpoint,
 
     // Match endpoints
+    OpponentsListEndpoint,
     MatchesEndpoint,
     MatchEndpoint,
     NewMatchEndpoint,

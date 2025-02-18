@@ -17,15 +17,15 @@ abstract class SecureEndpoint(route: String, method: HttpMethod = HttpMethod.Pos
         // If it's null, the user is not logged in
         if (session == null || session.isExpired()) {
             respondFailure(Errors.NotLoggedIn)
+            return
         }
-        session!! // won't be null
 
         // If it's not null, the user is logged in, but the session may no longer be valid, so check on the database
         val userSession = CacheRepository.getSessionByUUID(session.uuid)
         if (userSession == null) {
             respondFailure(Errors.NotLoggedIn)
+            return
         }
-        userSession!! // won't be null
 
         // Update the last seen
         CacheRepository.updateLastSeen(userSession)

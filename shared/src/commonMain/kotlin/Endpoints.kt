@@ -9,6 +9,8 @@ object Endpoints {
     }
 
     object Game {
+        const val OPPONENTS = "/opponents"
+
         const val GAME = "/matches/{id}/socket"
         const val MATCHES = "/matches"
         const val MATCH = "/matches/{id}"

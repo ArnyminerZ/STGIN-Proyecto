@@ -30,6 +30,24 @@
 
 <div id="matchLoadingIndicator" class="loader"></div>
 
+<dialog id="chooseOpponentDialog">
+    <h1>Escoje un oponente</h1>
+    <form method="post" action="/api/matches">
+        <input type="hidden" name="redirectTo" value="/" />
+
+        <label for="againstUserId">Usuario</label>
+        <select name="againstUserId" id="againstUserId" required></select>
+        <br/>
+
+        <label for="seed">Semilla</label>
+        <input name="seed" id="seed" type="number" value="0"/>
+
+        <hr/>
+        <button formmethod="dialog">Cancelar</button>
+        <button type="submit">Retar</button>
+    </form>
+</dialog>
+
 <div id="game">
     <div class="board" id="board" style="display: none"></div>
     <div class="board" id="opponentBoard" style="display: none"></div>

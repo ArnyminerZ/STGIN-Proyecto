@@ -4,9 +4,12 @@ import {renderGame} from "./game/render.mjs";
 import {getMatch, setMatch, setUsername} from "./game/storage.js";
 import {showSnackbar} from "./ui.mjs";
 import {ServerResponseException} from "./exceptions.js";
+import {listAvailableOpponents} from "./game/chooser.mjs";
 
 /**
  * Creates a new match, optionally against a specific user.
+ *
+ * @deprecated Start match using the form.
  *
  * @param {string|null} [againstUserId=null] - The ID of the user to create a match against. If null, a match will be
  * created against the machine.
@@ -53,6 +56,46 @@ async function isMatchReady(matchId) {
     return await response.text() === 'YES';
 }
 
+function loadAvailableOpponents() {
+    /** @type {HTMLSelectElement} */
+    const againstUserIdSelect = document.getElementById('againstUserId');
+    /** @type {HTMLInputElement} */
+    const seedInput = document.getElementById('seed');
+    /** @type {HTMLLabelElement} */
+    const seedLabel = document.querySelector('label[for="seed"]');
+
+    againstUserIdSelect.addEventListener('input', function () {
+        seedInput.style.display = againstUserIdSelect.value === 'null' ? '' : 'none';
+        seedLabel.style.display = seedInput.style.display;
+    });
+
+    listAvailableOpponents().then((opponents) => {
+        document.querySelector('input[name="redirectTo"]').value = `${window.location.origin}/`;
+
+        // Remove all children from select
+        for (let child of againstUserIdSelect.children) child.remove()
+
+        /**
+         * @param {string} value
+         * @param {string} text
+         */
+        function newElement(value, text = value) {
+            const element = document.createElement('option');
+            element.value = value;
+            element.innerText = text;
+            againstUserIdSelect.append(element)
+        }
+
+        // Element for matching against the AI
+        newElement('null', 'Máquina');
+
+        // Load all the opponents
+        for (const opponent of opponents) {
+            newElement(opponent);
+        }
+    });
+}
+
 /** @type {string|null} */
 let username = null;
 
@@ -77,6 +120,8 @@ window.addEventListener('load', async () => {
     const startMatchButton = document.getElementById('startMatchButton');
     /** @type {HTMLButtonElement} */
     const stopMatchButton = document.getElementById('stopMatchButton');
+    /** @type {HTMLDialogElement} */
+    const chooseOpponentDialog = document.getElementById('chooseOpponentDialog');
     /** @type {HTMLHeadElement} */
     const pendingMatchMessage = document.getElementById('pendingMatch');
     /** @type {HTMLHeadElement} */
@@ -167,8 +212,9 @@ window.addEventListener('load', async () => {
     }
 
     newMatchButton.addEventListener('click', async () => {
-        await newMatch();
-        window.location.reload();
+        //await newMatch();
+        //window.location.reload();
+        chooseOpponentDialog.showModal();
     });
     startMatchButton.addEventListener('click', async () => {
         showSnackbar('Iniciando partida...');
@@ -186,6 +232,8 @@ window.addEventListener('load', async () => {
     stopMatchButton.addEventListener('click', async () => {
 
     });
+
+    loadAvailableOpponents();
 
     console.log('Started match: ', startedMatch)
 

@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class NewMatchRequest(
-    val otherPlayerId: String? = null
+    val otherPlayerId: String? = null,
+    val seed: Int? = null
 )
