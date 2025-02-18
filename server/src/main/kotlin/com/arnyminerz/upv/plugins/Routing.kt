@@ -62,7 +62,7 @@ private fun Route.registerEndpoint(endpoint: Endpoint) {
 @OptIn(ExperimentalEncodingApi::class, ExperimentalUuidApi::class)
 fun Application.configureRouting() {
     routing {
-        staticResources("/", "src/main/resources/web")
+        staticResources("/", "web")
 
         for (endpoint in endpoints) {
             registerEndpoint(endpoint)
