@@ -1,6 +1,3 @@
-import kotlin.io.path.div
-import kotlin.io.path.readLines
-
 plugins {
     alias(libs.plugins.jvm)
     alias(libs.plugins.kotlinx.serialization)
@@ -21,10 +18,9 @@ repositories {
     mavenCentral()
 }
 
-val srcDir = File(projectDir, "src")
-val mainDir = File(srcDir, "main")
-val resourcesDir = File(mainDir, "resources")
-val webDir = File(resourcesDir, "web")
+fun File.sub(path: String): File = File(this, path)
+
+val webDir = projectDir.sub("src").sub("main").sub("resources").sub("web")
 val generatedJsDir = File(webDir, "js_gen")
     .also { it.mkdirs() }
 
@@ -75,7 +71,7 @@ kotlin {
 }
 
 val generateErrorCodes = tasks.register("generateErrorCodes") {
-    val file = rootProject.rootDir.toPath() / "shared" / "src" / "commonMain" / "kotlin" / "error" / "ErrorCodes.kt"
+    val file = rootProject.rootDir.sub("shared").sub("src").sub("commonMain").sub("kotlin").sub("error").sub("ErrorCodes.kt")
     val lines = file.readLines()
         .map { it.trim() }
         .filter { it.startsWith("const val") }
