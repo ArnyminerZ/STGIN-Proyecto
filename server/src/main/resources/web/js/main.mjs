@@ -167,7 +167,7 @@ window.addEventListener('load', async () => {
         setMatch(match);
 
         // Establish a connection to the socket
-        socket = new WebSocket(`ws://${window.location.host}/api/matches/${match.id}/socket`);
+        socket = new WebSocket(`wss://${window.location.host}/api/matches/${match.id}/socket`);
 
         socket.onopen = function (e) {
             console.info('Connected to the socket!');
